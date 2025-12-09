@@ -1,232 +1,652 @@
-<!doctype html>
-<html lang="my">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🌍 Realtime World Clock</title>
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #0b1220;
-      --accent: #60a5fa;
-      --glass: rgba(255,255,255,0.06);
-      --text: #e2e8f0;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Rajdhani', sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    .clock-card {
-      background: var(--card);
-      border-radius: 2rem;
-      box-shadow: 0 0 60px rgba(96,165,250,0.1);
-      padding: 2rem 3rem;
-      text-align: center;
-      backdrop-filter: blur(15px);
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      color: var(--text);
-      opacity: 0.9;
-      letter-spacing: 2px;
-      margin-bottom: 1rem;
-    }
-
-    .time {
-      font-size: 6rem;
-      font-weight: 600;
-      color: var(--accent);
-      text-shadow: 0 0 25px rgba(96,165,250,0.8), 0 0 50px rgba(37,99,235,0.5);
-      letter-spacing: 4px;
-    }
-
-    .seconds {
-      font-size: 1.4rem;
-      color: #93c5fd;
-      margin-top: -0.5rem;
-    }
-
-    .controls {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    select, button {
-      background: var(--glass);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 0.75rem;
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button.active {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 0 15px rgba(96,165,250,0.6);
-    }
-
-    .date-info {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.2rem;
-      flex-wrap: wrap;
-      color: #a5b4fc;
-    }
-
-    footer {
-      margin-top: 1.2rem;
-      font-size: 0.9rem;
-      color: #94a3b8;
-    }
-  </style>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toro 2D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #0c1a2f 0%, #152642 100%);
+            color: #fff;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Constellation Background */
+        .constellation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.3) 0.5px, transparent 1px),
+                radial-gradient(circle at 80% 40%, rgba(255,255,255,0.3) 0.5px, transparent 1px),
+                radial-gradient(circle at 30% 70%, rgba(255,255,255,0.3) 0.5px, transparent 1px),
+                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.3) 0.5px, transparent 1px),
+                radial-gradient(circle at 50% 90%, rgba(255,255,255,0.3) 0.5px, transparent 1px),
+                radial-gradient(circle at 60% 30%, rgba(255,255,255,0.2) 0.5px, transparent 1px),
+                radial-gradient(circle at 20% 60%, rgba(255,255,255,0.2) 0.5px, transparent 1px),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.2) 0.5px, transparent 1px);
+            background-size: 200px 200px;
+            animation: twinkle 4s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        /* App Container */
+        .app-container {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(12, 20, 36, 0.7);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(64, 156, 255, 0.2);
+            z-index: 10;
+        }
+        
+        /* Header */
+        .app-header {
+            padding: 18px;
+            text-align: center;
+            background: rgba(9, 18, 36, 0.5);
+            border-bottom: 1px solid rgba(64, 156, 255, 0.2);
+            position: relative;
+        }
+        
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(64, 156, 255, 0.6);
+            letter-spacing: 1px;
+            margin: 5px 0;
+        }
+        
+        .app-header:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4d8fdb, #0072ff, transparent);
+        }
+        
+        /* Main Result Section */
+        .main-result {
+            padding: 15px;
+            text-align: center;
+            background: rgba(16, 30, 56, 0.6);
+            border-bottom: 1px solid rgba(64, 156, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-result-label {
+            font-size: 12px;
+            color: #8da9c4;
+            margin-bottom: 5px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .main-result-time {
+            font-size: 16px;
+            font-weight: 500;
+            color: #a0c6ff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(64, 156, 255, 0.3);
+        }
+        
+        .main-result-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(64, 156, 255, 0.8);
+            margin: 10px 0;
+            position: relative;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        .main-result-number:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4d8fdb, transparent);
+        }
+        
+        /* Results Section */
+        .results-section {
+            padding: 15px;
+        }
+        
+        .result-row {
+            display: flex;
+            margin-bottom: 15px;
+            background: rgba(16, 30, 56, 0.7);
+            border-radius: 15px;
+            padding: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(64, 156, 255, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .result-row:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(64, 156, 255, 0.3);
+            border-color: rgba(64, 156, 255, 0.5);
+        }
+        
+        .time-slot {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .time-label {
+            font-size: 14px;
+            color: #8da9c4;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .number-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(64, 156, 255, 0.6);
+            position: relative;
+        }
+        
+        .number-display:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4d8fdb, transparent);
+        }
+        
+        .divider {
+            width: 1px;
+            background: rgba(64, 156, 255, 0.3);
+            margin: 0 8px;
+        }
+        
+        /* Tabs Section */
+        .tabs-section {
+            background: rgba(9, 18, 36, 0.5);
+            padding: 15px;
+            border-top: 1px solid rgba(64, 156, 255, 0.2);
+            border-bottom: 1px solid rgba(64, 156, 255, 0.2);
+        }
+        
+        .tabs-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .tab {
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(16, 30, 56, 0.6);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #a0c6ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(64, 156, 255, 0.3);
+            text-decoration: none;
+            display: block;
+        }
+        
+        .tab:hover, .tab.active {
+            background: linear-gradient(45deg, rgba(0, 114, 255, 0.3), rgba(0, 198, 255, 0.3));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(64, 156, 255, 0.4);
+            border-color: rgba(64, 156, 255, 0.5);
+        }
+        
+        /* Animation for main result */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pop-jump {
+            transform: scale(1.2);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        /* Status indicator */
+        .status-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-live {
+            background-color: #00ff00;
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
+        }
+        
+        .status-idle {
+            background-color: #ff9900;
+            box-shadow: 0 0 8px rgba(255, 153, 0, 0.7);
+        }
+        
+        .status-off {
+            background-color: #ff4d4d;
+            box-shadow: 0 0 8px rgba(255, 77, 77, 0.7);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 420px) {
+            .app-header h1 {
+                font-size: 22px;
+            }
+            
+            .main-result-number {
+                font-size: 42px;
+            }
+            
+            .number-display {
+                font-size: 26px;
+            }
+            
+            .tab {
+                font-size: 13px;
+                padding: 10px 5px;
+            }
+        }
+    </style>
 </head>
+<body oncontextmenu="return false;">
+    <!-- Constellation Background -->
+    <div class="constellation"></div>
 
-<body>
-  <div class="clock-card">
-    <h1>Find Your Time </h1>
-    <div class="time" id="time">00:00</div>
-    <div class="seconds" id="seconds">00s</div>
-
-    <div class="controls">
-      <select id="timezone">
-        <!-- Default -->
-        <option value="Asia/Yangon" selected>🇲🇲 Myanmar</option>
-
-        <!-- Southeast Asia -->
-        <option value="Asia/Bangkok">🇹🇭 Thailand</option>
-        <option value="Asia/Vientiane">🇱🇦 Laos</option>
-        <option value="Asia/Phnom_Penh">🇰🇭 Cambodia</option>
-        <option value="Asia/Singapore">🇸🇬 Singapore</option>
-        <option value="Asia/Jakarta">🇮🇩 Indonesia (Jakarta)</option>
-        <option value="Asia/Makassar">🇮🇩 Indonesia (Makassar)</option>
-        <option value="Asia/Jayapura">🇮🇩 Indonesia (Papua)</option>
-        <option value="Asia/Kuala_Lumpur">🇲🇾 Malaysia</option>
-        <option value="Asia/Manila">🇵🇭 Philippines</option>
-        <option value="Asia/Brunei">🇧🇳 Brunei</option>
-        <option value="Asia/Dili">🇹🇱 Timor-Leste</option>
-        <option value="Asia/Hanoi">🇻🇳 Vietnam</option>
-
-        <!-- Chinese-speaking regions -->
-        <option value="Asia/Shanghai">🇨🇳 China (Mainland)</option>
-        <option value="Asia/Hong_Kong">🇭🇰 Hong Kong</option>
-        <option value="Asia/Macau">🇲🇴 Macau</option>
-        <option value="Asia/Taipei">🇹🇼 Taiwan</option>
-
-        <!-- South Asia -->
-        <option value="Asia/Kolkata">🇮🇳 India</option>
-        <option value="Asia/Kathmandu">🇳🇵 Nepal</option>
-        <option value="Asia/Colombo">🇱🇰 Sri Lanka</option>
-        <option value="Asia/Dhaka">🇧🇩 Bangladesh</option>
-        <option value="Asia/Karachi">🇵🇰 Pakistan</option>
-        <option value="Asia/Kabul">🇦🇫 Afghanistan</option>
-        <option value="Asia/Tashkent">🇺🇿 Uzbekistan</option>
-
-        <!-- East Asia -->
-        <option value="Asia/Tokyo">🇯🇵 Japan</option>
-        <option value="Asia/Seoul">🇰🇷 South Korea</option>
-        <option value="Asia/Pyongyang">🇰🇵 North Korea</option>
-        <option value="Asia/Ulaanbaatar">🇲🇳 Mongolia</option>
-
-        <!-- Central Asia -->
-        <option value="Asia/Almaty">🇰🇿 Kazakhstan</option>
-        <option value="Asia/Bishkek">🇰🇬 Kyrgyzstan</option>
-        <option value="Asia/Dushanbe">🇹🇯 Tajikistan</option>
-        <option value="Asia/Ashgabat">🇹🇲 Turkmenistan</option>
-
-        <!-- Middle East / West Asia -->
-        <option value="Asia/Dubai">🇦🇪 UAE</option>
-        <option value="Asia/Qatar">🇶🇦 Qatar</option>
-        <option value="Asia/Kuwait">🇰🇼 Kuwait</option>
-        <option value="Asia/Bahrain">🇧🇭 Bahrain</option>
-        <option value="Asia/Riyadh">🇸🇦 Saudi Arabia</option>
-        <option value="Asia/Tehran">🇮🇷 Iran</option>
-        <option value="Asia/Baghdad">🇮🇶 Iraq</option>
-        <option value="Asia/Jerusalem">🇮🇱 Israel</option>
-        <option value="Asia/Amman">🇯🇴 Jordan</option>
-        <option value="Asia/Beirut">🇱🇧 Lebanon</option>
-        <option value="Asia/Damascus">🇸🇾 Syria</option>
-        <option value="Asia/Tbilisi">🇬🇪 Georgia</option>
-        <option value="Asia/Yerevan">🇦🇲 Armenia</option>
-        <option value="Asia/Baku">🇦🇿 Azerbaijan</option>
-      </select>
-
-      <button id="t12">12-hour</button>
-      <button id="t24" class="active">24-hour</button>
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- App Header -->
+        <div class="app-header">
+            <h1>LUCKY DRAGON</h1>
+        </div>
+        
+        <!-- Main Result Section -->
+        <div class="main-result">
+            <div class="main-result-time">Today, 9:00 PM</div>
+            <div class="main-result-number">00</div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section">
+            <div class="result-row">
+                <div class="time-slot">
+                    <div class="time-label">11:00 AM</div>
+                    <div class="number-display">81</div>
+                </div>
+                <div class="divider"></div>
+                <div class="time-slot">
+                    <div class="time-label">1:00 PM</div>
+                    <div class="number-display">90</div>
+                </div>
+            </div>
+            
+            <div class="result-row">
+                <div class="time-slot">
+                    <div class="time-label">3:00 PM</div>
+                    <div class="number-display">77</div>
+                </div>
+                <div class="divider"></div>
+                <div class="time-slot">
+                    <div class="time-label">5:00 PM</div>
+                    <div class="number-display">46</div>
+                </div>
+            </div>
+            
+            <div class="result-row">
+                <div class="time-slot">
+                    <div class="time-label">7:00 PM</div>
+                    <div class="number-display">86</div>
+                </div>
+                <div class="divider"></div>
+                <div class="time-slot">
+                    <div class="time-label">9:00 PM</div>
+                    <div class="number-display">70</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs Section -->
+        <div class="tabs-section">
+            <div class="tabs-container">
+                <a href="history.html" class="tab active" target="_blank">
+                    History 
+                </a>
+            </div>
+        </div>
     </div>
+    
+    <script>
+        // Configuration - Developer can change these numbers if needed
+        const predefinedResults = {
+            '11:00 AM': 34,    // Developer can change this number
+            '1:00 PM': 60,     // Developer can change this number
+            '3:00 PM': 27,     // Developer can change this number
+            '5:00 PM': 47,    // Developer can change this number
+            '7:00 PM': 55,     // Developer can change this number
+            '9:00 PM': 93,     // Developer can change this number
+        };
 
-    <div class="date-info">
-      <div id="date"></div>
-      <div id="day"></div>
-      <div id="zone"></div>
-    </div>
+        // Variables to track current state
+        let isAnimating = false;
+        let currentResult = null;
+        let freezeTimeout = null;
+        let animationInterval = null;
+        let currentTimeSlot = null;
 
-    <footer>Design by Rome💙</footer>
-  </div>
+        // DOM elements
+        const mainResultNumber = document.querySelector('.main-result-number');
+        const mainResultTime = document.querySelector('.main-result-time');
+        const numberDisplays = document.querySelectorAll('.number-display');
+        const timeLabels = document.querySelectorAll('.time-label');
 
-  <script>
-    const timeEl = document.getElementById("time");
-    const secondsEl = document.getElementById("seconds");
-    const dateEl = document.getElementById("date");
-    const dayEl = document.getElementById("day");
-    const zoneEl = document.getElementById("zone");
-    const tzSelect = document.getElementById("timezone");
-    const t12 = document.getElementById("t12");
-    const t24 = document.getElementById("t24");
+        // Function to generate random 2D number (00-99)
+        function generateRandomNumber() {
+            return Math.floor(Math.random() * 100).toString().padStart(2, '0');
+        }
 
-    let is24 = true;
+        // Function to animate the main result number every 5 seconds
+        function animateResultNumber() {
+            if (isAnimating) return;
 
-    function updateClock() {
-      const tz = tzSelect.value;
-      const now = new Date().toLocaleString("en-US", { timeZone: tz });
-      const date = new Date(now);
+            isAnimating = true;
+            const animationDuration = 5000; // 5 seconds
+            const interval = 100; // Update every 100ms
+            
+            let count = 0;
+            const changeInterval = 5000; // 5 seconds interval to change the number
+            
+            animationInterval = setInterval(() => {
+                count += interval;
+                mainResultNumber.textContent = generateRandomNumber();
 
-      let hours = date.getHours();
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      const seconds = date.getSeconds().toString().padStart(2, "0");
-      const ampm = hours >= 12 ? "PM" : "AM";
+                // After 5 seconds, stop the animation and freeze
+                if (count >= animationDuration) {
+                    clearInterval(animationInterval);
+                    isAnimating = false;
+                }
+            }, changeInterval);
+        }
 
-      if (!is24) {
-        hours = hours % 12 || 12;
-      }
+        // Function to freeze the result for a specific time slot
+        function freezeResult(timeSlot) {
+            clearInterval(animationInterval);
+            isAnimating = false;
+            
+            // Get the predefined result or generate a random one if not set
+            const result = predefinedResults[timeSlot] || generateRandomNumber();
+            currentResult = result.toString().padStart(2, '0');
+            
+            // Update the main display
+            mainResultNumber.textContent = currentResult;
+            
+            // Update the corresponding time slot display
+            updateTimeSlotDisplay(timeSlot, currentResult);
+            
+            // Freeze until 1 minute past the hour
+            const freezeUntil = new Date();
+            const [hours, period] = timeSlot.split(' ');
+            let freezeHours = parseInt(hours);
+            
+            if (period === 'PM' && freezeHours !== 12) {
+                freezeHours += 12;
+            } else if (period === 'AM' && freezeHours === 12) {
+                freezeHours = 0;
+            }
+            
+            freezeUntil.setHours(freezeHours, 1, 0, 0);
+            
+            // If we're already past the freeze time (e.g., page loaded late)
+            if (freezeUntil < new Date()) {
+                freezeUntil.setDate(freezeUntil.getDate() + 1);
+            }
+            
+            // Set timeout to resume normal operation after freeze period
+            clearTimeout(freezeTimeout);
+            freezeTimeout = setTimeout(() => {
+                currentResult = null;
+                currentTimeSlot = null;
+            }, freezeUntil - new Date());
+        }
 
-      timeEl.textContent = `${hours.toString().padStart(2, "0")}:${minutes}`;
-      secondsEl.textContent = `${seconds}s ${is24 ? "" : ampm}`;
-      dateEl.textContent = date.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
-      dayEl.textContent = date.toLocaleDateString("en-GB", { weekday: "long" });
-      zoneEl.textContent = tz;
-    }
+        // Function to update the display for a specific time slot
+        function updateTimeSlotDisplay(timeSlot, result) {
+            timeLabels.forEach((label, index) => {
+                if (label.textContent === timeSlot) {
+                    numberDisplays[index].textContent = result;
+                }
+            });
+        }
 
-    setInterval(updateClock, 1000);
-    updateClock();
+        // Function to set all time slots to null/--
+        function setAllTimeSlotsToNull() {
+            numberDisplays.forEach(display => {
+                display.textContent = '--';
+            });
+        }
 
-    t12.onclick = () => { is24 = false; t12.classList.add("active"); t24.classList.remove("active"); };
-    t24.onclick = () => { is24 = true; t24.classList.add("active"); t12.classList.remove("active"); };
-  </script>
+        // Function to check current time and trigger appropriate actions
+        function checkTimeAndUpdate() {
+            const now = new Date();
+            const myanmarTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Yangon' }));
+            const hours = myanmarTime.getHours();
+            const minutes = myanmarTime.getMinutes();
+            const seconds = myanmarTime.getSeconds();
+            const day = myanmarTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            
+            // Check if it's Sunday (day 0)
+            if (day === 0) {
+                // Sunday - show null/-- for all results
+                clearInterval(animationInterval);
+                isAnimating = false;
+                mainResultNumber.textContent = '--';
+                setAllTimeSlotsToNull();
+                return;
+            }
+            
+            // Format current time for comparison
+            const currentHour12 = hours % 12 || 12;
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const currentTimeSlot = `${currentHour12}:00 ${period}`;
+            
+            // Check if we're in the result time (exactly at the hour)
+            const timeSlots = Object.keys(predefinedResults);
+            const currentSlotIndex = timeSlots.indexOf(currentTimeSlot);
+            
+            if (currentSlotIndex !== -1 && minutes === 0 && seconds === 0) {
+                // Exactly at the hour - freeze the result immediately
+                freezeResult(timeSlots[currentSlotIndex]);
+            } else if (hours >= 9 && hours < 21) { // 9AM to 9PM
+                // During lottery hours but not at result time
+                if (!currentResult && !isAnimating) {
+                    animateResultNumber();
+                }
+            } else {
+                // Outside lottery hours
+                clearInterval(animationInterval);
+                isAnimating = false;
+                mainResultNumber.textContent = '--';
+            }
+            
+            // Update all time slot displays
+            updateAllDisplays();
+        }
+
+        // Function to update all time slot displays based on current time
+        function updateAllDisplays() {
+            const now = new Date();
+            const myanmarTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Yangon' }));
+            const currentHour = myanmarTime.getHours();
+            const currentMinutes = myanmarTime.getMinutes();
+            const day = myanmarTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            
+            // If Sunday, set all to null and return
+            if (day === 0) {
+                setAllTimeSlotsToNull();
+                return;
+            }
+            
+            timeLabels.forEach((label, index) => {
+                const timeSlot = label.textContent;
+                const [hours, period] = timeSlot.split(' ');
+                let slotHour = parseInt(hours);
+                
+                if (period === 'PM' && slotHour !== 12) {
+                    slotHour += 12;
+                } else if (period === 'AM' && slotHour === 12) {
+                    slotHour = 0;
+                }
+                
+                // If current time is exactly at the hour for this time slot, show the result
+                if (currentHour === slotHour && currentMinutes === 0) {
+                    numberDisplays[index].textContent = predefinedResults[timeSlot]?.toString().padStart(2, '0') || '--';
+                }
+                // If this time slot has passed (even just 1 minute past), show the result
+                else if (currentHour > slotHour || 
+                        (currentHour === slotHour && currentMinutes >= 0)) {
+                    numberDisplays[index].textContent = predefinedResults[timeSlot]?.toString().padStart(2, '0') || '--';
+                } else {
+                    // Future time slot, show --
+                    numberDisplays[index].textContent = '--';
+                }
+            });
+        }
+
+      // Function to update current time display
+        function updateCurrentTime() {
+            const now = new Date();
+            const myanmarTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Yangon' }));
+            
+            // Set Myanmar Time Zone offset (GMT+6:30)
+            const options = {
+                timeZone: 'Asia/Yangon',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            };
+
+            const timeString = now.toLocaleTimeString('en-US', options);
+            const dayName = now.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                timeZone: 'Asia/Yangon'
+            });
+
+            // Combine time and day (display only once)
+            const formattedTime = `${timeString} (${dayName})`;
+
+            // Update the main-result-time element
+            document.querySelector('.main-result-time').textContent = formattedTime;
+            
+            // If Sunday, ensure main result shows --
+            if (myanmarTime.getDay() === 0) {
+                mainResultNumber.textContent = '--';
+            }
+        }
+
+        // Initialize
+        function init() {
+            // Set up time check every second
+            setInterval(checkTimeAndUpdate, 1000);
+            
+            // Initial check
+            checkTimeAndUpdate();
+            updateAllDisplays();
+            
+            // Update current time
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        }
+
+        // Start the application
+        init();
+
+        // Disable developer tools
+        document.addEventListener('keydown', function (event) {
+            if (
+                event.key === "F12" ||
+                (event.ctrlKey && event.shiftKey && event.key === "I") ||
+                (event.ctrlKey && event.shiftKey && event.key === "J") ||
+                (event.ctrlKey && event.key === "U")
+            ) {
+                event.preventDefault();
+            }
+        });
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered: ', registration.scope);
+                        
+                        // Check for updates periodically
+                        setInterval(() => {
+                            registration.update();
+                        }, 60 * 60 * 1000); // Check for updates every hour
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+    
+    <!-- Font Awesome for icons (optional) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>

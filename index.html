@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="my">
 <head>
@@ -17,7 +16,7 @@ body {
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .header h1 { font-size: 28px; color: #b9f2ff; text-shadow: 0 0 6px #b9f2ff,0 0 12px #ffffff; }
 .total { font-size: 24px; font-weight: bold; color: #ffd700; text-shadow: 0 0 6px #ffd700,0 0 12px #fff; }
-.card, .bulk-input-card, .remaining-card, .winning-check-card {
+.card, .bulk-input-card, .remaining-card {
   background: rgba(255,255,255,0.05);
   padding:20px;
   border-radius:16px;
@@ -27,7 +26,7 @@ body {
   backdrop-filter: blur(8px);
 }
 label { display:block; font-size:12px; color:#c0c0c0; margin-bottom:6px; }
-textarea,input,select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#f0f8ff; font-size:14px; box-sizing:border-box; outline:none; }
+textarea,input { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#f0f8ff; font-size:14px; box-sizing:border-box; outline:none; }
 button { background: linear-gradient(135deg,#b9f2ff,#ffd700); border:none; padding:10px 16px; border-radius:12px; color:#0b0b1a; font-weight:bold; font-size:14px; cursor:pointer; text-shadow:0 0 2px #fff; transition: all 0.2s ease; }
 button:hover { transform:scale(1.05); box-shadow:0 0 12px #b9f2ff,0 0 24px #ffd700; }
 button.ghost { background:transparent; border:1px solid rgba(255,255,255,0.2); color:#c0c0c0; }
@@ -37,8 +36,8 @@ button.small { padding:6px 12px; font-size:13px; }
 .grid-item:hover { transform: scale(1.05); box-shadow: 0 0 12px #b9f2ff, 0 0 24px #ffd700; }
 .grid-number { font-size:18px; font-weight:bold; margin-bottom:4px; color:#b9f2ff; text-shadow:0 0 6px #ffffff; }
 .grid-amount { font-size:14px; color:#ffd700; }
-.bulk-input-card, .winning-check-card { display: none; }
-.remaining-box, .winning-results-box { white-space: pre-wrap; max-height:200px; overflow:auto; padding:12px; border-radius:12px; background:rgba(255,255,255,0.03); font-family:monospace; font-size:13px; line-height:1.4; margin-top:10px; border:1px solid rgba(255,255,255,0.2); color:#f0f8ff; }
+.bulk-input-card { display: none; }
+.remaining-box { white-space: pre-wrap; max-height:200px; overflow:auto; padding:12px; border-radius:12px; background:rgba(255,255,255,0.03); font-family:monospace; font-size:13px; line-height:1.4; margin-top:10px; border:1px solid rgba(255,255,255,0.2); color:#f0f8ff; }
 .stats { margin-top:10px; font-size:13px; color:#c0c0c0; }
 .stats strong { color:#ffd700; }
 .method-note { 
@@ -48,50 +47,6 @@ button.small { padding:6px 12px; font-size:13px; }
   margin: 10px 0; 
   border-radius: 8px;
   font-size: 13px;
-}
-.winning-input-row { display: flex; gap: 12px; align-items: center; margin-bottom: 15px; }
-.winning-input-row .input-group { flex: 1; }
-.winning-input-row .multiplier-group { flex: 0.5; }
-.winning-results-box { max-height: 300px; }
-.win-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.win-item:last-child { border-bottom: none; }
-.win-number { color: #b9f2ff; }
-.win-amount { color: #ffd700; }
-.win-total { font-weight: bold; color: #4ade80; }
-.win-grand-total { margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(255,215,0,0.3); font-size: 18px; color: #4ade80; text-align: center; }
-.congratulations { 
-  text-align: center; 
-  padding: 20px; 
-  animation: pulse 2s infinite;
-  margin-top: 20px;
-  background: rgba(74, 222, 128, 0.1);
-  border-radius: 12px;
-  border: 2px solid #4ade80;
-}
-.congratulations h3 { 
-  font-size: 24px; 
-  color: #4ade80; 
-  margin-bottom: 15px;
-  text-shadow: 0 0 8px #4ade80;
-}
-.heart { 
-  font-size: 48px; 
-  color: #ff6b8b; 
-  animation: heartbeat 1.5s infinite;
-  display: inline-block;
-}
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-@keyframes heartbeat {
-  0% { transform: scale(1); }
-  5% { transform: scale(1.1); }
-  10% { transform: scale(1); }
-  15% { transform: scale(1.1); }
-  20% { transform: scale(1); }
-  100% { transform: scale(1); }
 }
 </style>
 </head>
@@ -112,45 +67,12 @@ button.small { padding:6px 12px; font-size:13px; }
     </div>
   </div>
   
-  <!-- Winning Check Card -->
-  <div id="winning-card" class="card winning-check-card">
-    <label>Winning Numbers Check</label>
-    
-    <div class="winning-input-row">
-      <div class="input-group">
-        <label>Winning Numbers (e.g., 125, 340, 789)</label>
-        <input type="text" id="winning-numbers" placeholder="Enter winning numbers separated by comma or space">
-      </div>
-      <div class="multiplier-group">
-        <label>Multiplier (အဆ)</label>
-        <select id="multiplier">
-          <option value="500">x500</option>
-          <option value="800">x800</option>
-          <option value="700">x700</option>
-          <option value="600">x600</option>
-          <option value="custom">Custom</option>
-        </select>
-        <input type="number" id="custom-multiplier" placeholder="Enter custom multiplier" style="display:none; margin-top:8px;">
-      </div>
-    </div>
-    
-    <div style="margin-top:10px; display:flex; gap:8px;">
-      <button id="btn-check-winning" class="small">Check Winning</button>
-      <button id="btn-clear-winning" class="small ghost">Clear</button>
-    </div>
-    
-    <div id="winning-results-box" class="winning-results-box">
-      Enter winning numbers and click "Check Winning"
-    </div>
-  </div>
-  
   <div class="card">
     <div id="ledger-grid" class="ledger-grid"></div>
     <div style="display:flex; gap:8px; align-items:center;">
       <button id="btn-copy" class="small">Copy Ledger</button>
       <button id="btn-clear" class="small ghost">Clear All</button>
       <button id="btn-toggle-bulk" class="small">Add Ledger</button>
-      <button id="btn-toggle-winning" class="small">Check Winning</button>
     </div>
     <div class="stats">
       Entries: <span id="stat-count">0</span> — Total Amount: <strong id="stat-sum">0</strong>
@@ -184,11 +106,7 @@ button.small { padding:6px 12px; font-size:13px; }
   const remainingBox = document.getElementById('remaining-box');
   const remainingLabel = document.getElementById('remaining-label');
   const bulkCard = document.getElementById('bulk-card');
-  const winningCard = document.getElementById('winning-card');
   const bulkToggleBtn = document.getElementById('btn-toggle-bulk');
-  const winningToggleBtn = document.getElementById('btn-toggle-winning');
-  const multiplierSelect = document.getElementById('multiplier');
-  const customMultiplierInput = document.getElementById('custom-multiplier');
 
   // Load ledger from localStorage
   const saved = localStorage.getItem('romeLedger');
@@ -260,35 +178,10 @@ button.small { padding:6px 12px; font-size:13px; }
   bulkToggleBtn.addEventListener('click', ()=>{
     if(bulkCard.style.display==='none' || bulkCard.style.display===''){
       bulkCard.style.display='block';
-      winningCard.style.display='none';
       bulkToggleBtn.textContent='Hide Input';
-      winningToggleBtn.textContent='Check Winning';
     } else {
       bulkCard.style.display='none';
       bulkToggleBtn.textContent='Add Ledger';
-    }
-  });
-
-  // Toggle Winning Check
-  winningToggleBtn.addEventListener('click', ()=>{
-    if(winningCard.style.display==='none' || winningCard.style.display===''){
-      winningCard.style.display='block';
-      bulkCard.style.display='none';
-      winningToggleBtn.textContent='Hide Check';
-      bulkToggleBtn.textContent='Add Ledger';
-    } else {
-      winningCard.style.display='none';
-      winningToggleBtn.textContent='Check Winning';
-    }
-  });
-
-  // Multiplier select change handler
-  multiplierSelect.addEventListener('change', function() {
-    if(this.value === 'custom') {
-      customMultiplierInput.style.display = 'block';
-      customMultiplierInput.focus();
-    } else {
-      customMultiplierInput.style.display = 'none';
     }
   });
 
@@ -346,105 +239,6 @@ button.small { padding:6px 12px; font-size:13px; }
     const text = remainingBox.textContent.trim();
     if(!text||text==='(press "Show Remaining")'){alert('No remaining'); return;}
     await navigator.clipboard.writeText(text); alert('Remaining copied');
-  });
-
-  // Check Winning Numbers
-  document.getElementById('btn-check-winning').addEventListener('click', ()=>{
-    const winningInput = document.getElementById('winning-numbers').value.trim();
-    if(!winningInput) {
-      alert('Please enter winning numbers');
-      return;
-    }
-
-    // Get multiplier
-    let multiplier;
-    if(multiplierSelect.value === 'custom') {
-      multiplier = parseInt(customMultiplierInput.value);
-      if(!multiplier || multiplier <= 0) {
-        alert('Please enter a valid custom multiplier');
-        return;
-      }
-    } else {
-      multiplier = parseInt(multiplierSelect.value);
-    }
-
-    // Parse winning numbers
-    const winningNumbers = splitNumbers(winningInput);
-    if(winningNumbers.length === 0) {
-      alert('No valid winning numbers found');
-      return;
-    }
-
-    // Check each winning number
-    let totalWin = 0;
-    const results = [];
-    const winningDetails = [];
-
-    winningNumbers.forEach(numStr => {
-      const num = parseInt(numStr, 10);
-      if(num >= 0 && num <= 999) {
-        const betAmount = ledger.get(num) || 0;
-        const winAmount = betAmount * multiplier;
-        totalWin += winAmount;
-        
-        if(betAmount > 0) {
-          winningDetails.push({
-            number: pad3(num),
-            betAmount: betAmount,
-            winAmount: winAmount
-          });
-        }
-        
-        results.push(`${pad3(num)}: ${betAmount} × ${multiplier} = ${winAmount}`);
-      }
-    });
-
-    // Display results
-    const resultsBox = document.getElementById('winning-results-box');
-    
-    if(winningDetails.length === 0) {
-      resultsBox.innerHTML = '<div style="text-align:center; color:#c0c0c0;">No winning numbers found in ledger</div>';
-      return;
-    }
-
-    let html = '';
-    
-    // Add winning details
-    winningDetails.forEach(detail => {
-      html += `
-        <div class="win-item">
-          <span class="win-number">${detail.number}</span>
-          <span class="win-amount">${detail.betAmount} × ${multiplier}</span>
-          <span class="win-total">= ${detail.winAmount}</span>
-        </div>
-      `;
-    });
-
-    // Add grand total
-    html += `
-      <div class="win-grand-total">
-        Total Win: ${totalWin}
-      </div>
-    `;
-
-    // Add congratulations if there's a win
-    if(totalWin > 0) {
-      html += `
-        <div class="congratulations">
-          <h3>CONGRATULATIONS! 🎉</h3>
-          <div class="heart">❤️</div>
-          <div style="margin-top:10px;">You won ${totalWin}!</div>
-        </div>
-      `;
-    }
-
-    resultsBox.innerHTML = html;
-  });
-
-  // Clear winning check
-  document.getElementById('btn-clear-winning').addEventListener('click', ()=>{
-    document.getElementById('winning-numbers').value = '';
-    document.getElementById('winning-results-box').innerHTML = 'Enter winning numbers and click "Check Winning"';
   });
 
   // Handle Bulk Add Ledger
@@ -533,7 +327,40 @@ button.small { padding:6px 12px; font-size:13px; }
             } else {
               ledger.has(num) ? ledger.set(num, ledger.get(num) + allLinesAmount) : ledger.set(num, allLinesAmount);
             }
-                }
+          }
+        } else {
+          // Original non-range logic
+          const nums = splitNumbers(line);
+          nums.forEach(n => {
+            if (allLinesMethod === 'R') {
+              const numsToAdd = permute3(n);
+              numsToAdd.forEach(nn => {
+                ledger.has(nn) ? ledger.set(nn, ledger.get(nn) + allLinesAmount) : ledger.set(nn, allLinesAmount);
+              });
+            } else {
+              const nn = parseInt(n, 10);
+              ledger.has(nn) ? ledger.set(nn, ledger.get(nn) + allLinesAmount) : ledger.set(nn, allLinesAmount);
+            }
+          });
+        }
+      });
+    } else {
+      // Process line by line
+      lines.forEach(line => {
+        // Check if this line is a range
+        const rangeInfo = processRange(line);
+        if (rangeInfo) {
+          // Process range
+          for (let num = rangeInfo.start; num <= rangeInfo.end; num++) {
+            if (rangeInfo.method === 'r') {
+              const perms = permute3(pad3(num));
+              perms.forEach(permNum => {
+                ledger.has(permNum) ? ledger.set(permNum, ledger.get(permNum) + rangeInfo.amount) : ledger.set(permNum, rangeInfo.amount);
+              });
+            } else {
+              ledger.has(num) ? ledger.set(num, ledger.get(num) + rangeInfo.amount) : ledger.set(num, rangeInfo.amount);
+            }
+          }
         } else {
           // Original non-range logic
           let amt = 10, isR = false;

@@ -1,0 +1,2294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Rome 2D Lottery Ledger V2.0</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Purple Crystal Theme */
+:root {
+  /* Dark Theme (Default) - Purple Crystal */
+  --bg-primary: radial-gradient(circle at top left, #2a0b3a, #1a0525);
+  --text-primary: #f0e6ff;
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(155, 89, 182, 0.3);
+  --accent-color: #c678ff;
+  --gold-color: #ffd700;
+  --purple-light: #aa66cc;
+  --subtle-color: #b39ddb;
+  --danger-color: #ff6b6b;
+  --success-color: #4caf50;
+  --shadow-color: rgba(0,0,0,0.3);
+  --hover-bg: rgba(155, 89, 182, 0.15);
+  --crystal-glow: 0 0 15px rgba(198, 120, 255, 0.5);
+}
+
+.light-theme {
+  /* Light Theme - Purple Crystal */
+  --bg-primary: radial-gradient(circle at top left, #f3e5f5, #e1bee7);
+  --text-primary: #4a148c;
+  --card-bg: rgba(255,255,255,0.8);
+  --card-border: rgba(156, 39, 176, 0.3);
+  --accent-color: #7b1fa2;
+  --gold-color: #ff8f00;
+  --purple-light: #8e24aa;
+  --subtle-color: #7e57c2;
+  --danger-color: #d32f2f;
+  --success-color: #2e7d32;
+  --shadow-color: rgba(0,0,0,0.15);
+  --hover-bg: rgba(156, 39, 176, 0.1);
+  --crystal-glow: 0 0 10px rgba(156, 39, 176, 0.3);
+}
+
+body {
+  margin: 0;
+  padding: 15px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+.header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 15px;
+  background: var(--card-bg);
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--crystal-glow);
+}
+.header h1 { 
+  font-size: 20px; 
+  color: var(--accent-color); 
+  text-shadow: 0 0 6px var(--accent-color);
+  margin: 0;
+}
+.total { 
+  font-size: 18px; 
+  font-weight: bold; 
+  color: var(--gold-color); 
+  text-shadow: 0 0 6px var(--gold-color);
+}
+.subtitle {
+  font-size: 11px;
+  color: var(--subtle-color);
+  margin-top: 3px;
+}
+.card {
+  background: var(--card-bg);
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 16px var(--shadow-color), 0 0 5px rgba(198, 120, 255, 0.1);
+  transition: all 0.3s ease;
+}
+.card:hover {
+  box-shadow: 0 6px 20px var(--shadow-color), var(--crystal-glow);
+}
+.card-title {
+  font-size: 14px;
+  color: var(--accent-color);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+label { 
+  display: block; 
+  font-size: 11px; 
+  color: var(--subtle-color); 
+  margin-bottom: 3px; 
+  font-weight: 500;
+}
+textarea, input, select { 
+  width: 100%; 
+  padding: 8px 10px; 
+  border-radius: 8px; 
+  border: 1px solid var(--card-border); 
+  background: rgba(255,255,255,0.1); 
+  color: var(--text-primary); 
+  font-size: 12px; 
+  box-sizing: border-box; 
+  outline: none; 
+  transition: border 0.3s;
+}
+textarea:focus, input:focus, select:focus {
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 0 8px rgba(198, 120, 255, 0.3);
+}
+button { 
+  background: linear-gradient(135deg, var(--accent-color), var(--purple-light)); 
+  border: none; 
+  padding: 7px 12px; 
+  border-radius: 8px; 
+  color: #f0e6ff; 
+  font-weight: bold; 
+  font-size: 12px; 
+  cursor: pointer; 
+  transition: all 0.2s ease; 
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+button:hover { 
+  transform: scale(1.02); 
+  box-shadow: 0 0 10px var(--accent-color); 
+}
+button.ghost { 
+  background: transparent; 
+  border: 1px solid var(--card-border); 
+  color: var(--subtle-color); 
+}
+button.ghost:hover {
+  background: var(--hover-bg);
+}
+button.small { 
+  padding: 5px 10px; 
+  font-size: 11px; 
+}
+button.success {
+  background: linear-gradient(135deg, var(--success-color), #81c784);
+}
+.ledger-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
+  gap: 8px; 
+  margin-bottom: 12px; 
+  max-height: 250px; 
+  overflow-y: auto; 
+  padding: 5px; 
+  border-radius: 8px; 
+  background: rgba(255,255,255,0.05); 
+}
+.grid-item { 
+  background: var(--card-bg); 
+  border-radius: 8px; 
+  padding: 8px 5px; 
+  text-align: center; 
+  border: 1px solid var(--card-border); 
+  transition: transform 0.3s; 
+  cursor: pointer;
+  position: relative;
+}
+.grid-item:hover { 
+  transform: scale(1.05); 
+  box-shadow: 0 0 8px var(--accent-color); 
+}
+.grid-item.high-bet {
+  border-color: var(--gold-color);
+  background: rgba(255, 215, 0, 0.1);
+}
+.grid-number { 
+  font-size: 14px; 
+  font-weight: bold; 
+  margin-bottom: 2px; 
+  color: var(--accent-color); 
+}
+.grid-amount { 
+  font-size: 11px; 
+  color: var(--gold-color); 
+}
+.bulk-input-card, .winning-card, .settings-card, .history-card, .contact-card { 
+  display: none; 
+}
+.remaining-box { 
+  white-space: pre-wrap; 
+  max-height: 120px; 
+  overflow: auto; 
+  padding: 8px; 
+  border-radius: 8px; 
+  background: rgba(255,255,255,0.05); 
+  font-family: 'Courier New', monospace; 
+  font-size: 11px; 
+  line-height: 1.2; 
+  margin-top: 6px; 
+  border: 1px solid var(--card-border); 
+}
+.stats { 
+  margin-top: 6px; 
+  font-size: 11px; 
+  color: var(--subtle-color); 
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.stats strong { 
+  color: var(--gold-color); 
+}
+.stats-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.tabs {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 6px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 5px 10px;
+  background: var(--card-bg);
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--subtle-color);
+  transition: all 0.2s;
+  font-size: 12px;
+  flex: 1;
+  text-align: center;
+  min-width: 80px;
+}
+.tab.active {
+  background: rgba(198, 120, 255, 0.15);
+  color: var(--accent-color);
+  box-shadow: 0 0 5px rgba(198, 120, 255, 0.3);
+}
+.tab:hover:not(.active) {
+  background: var(--hover-bg);
+}
+.action-buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.footer {
+  margin-top: 15px; 
+  text-align: center; 
+  color: var(--subtle-color); 
+  font-size: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--card-border);
+}
+.winning-item {
+  margin-bottom: 3px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: var(--card-bg);
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.win-amount {
+  color: var(--gold-color);
+  font-weight: bold;
+}
+.no-winner {
+  color: var(--danger-color);
+}
+#winning-result {
+  margin-top: 10px;
+  border-top: 1px solid var(--card-border);
+  padding-top: 8px;
+}
+#congrats-message {
+  font-size: 14px;
+  color: var(--gold-color);
+  text-align: center;
+  margin-bottom: 5px;
+}
+#total-win-amount {
+  font-size: 16px;
+  color: var(--gold-color);
+  font-weight: bold;
+}
+.amount-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+.amount-option {
+  text-align: center;
+  padding: 6px;
+  background: var(--card-bg);
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  transition: all 0.2s;
+  font-size: 11px;
+}
+.amount-option:hover {
+  background: var(--hover-bg);
+}
+.amount-option.active {
+  background: rgba(255,215,0,0.2);
+  border-color: var(--gold-color);
+}
+.settings-option {
+  margin-bottom: 12px;
+}
+.settings-option label {
+  font-size: 12px;
+  margin-bottom: 6px;
+  display: block;
+}
+.settings-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.settings-btn {
+  flex: 1;
+  min-width: 120px;
+  justify-content: center;
+}
+.lang-badge {
+  font-size: 10px;
+  background: var(--accent-color);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+}
+.history-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 5px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+}
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 11px;
+}
+.history-item:last-child {
+  border-bottom: none;
+}
+.history-content {
+  flex: 1;
+  margin-right: 10px;
+}
+.history-numbers {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+.history-amount {
+  color: var(--gold-color);
+  font-weight: bold;
+}
+.history-date {
+  font-size: 9px;
+  color: var(--subtle-color);
+  margin-top: 2px;
+}
+.bet-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+.bet-type-btn {
+  text-align: center;
+  padding: 8px 4px;
+  background: var(--card-bg);
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  transition: all 0.2s;
+  font-size: 10px;
+  line-height: 1.2;
+}
+.bet-type-btn:hover {
+  background: var(--hover-bg);
+}
+.bet-type-btn.active {
+  background: rgba(198, 120, 255, 0.2);
+  border-color: var(--accent-color);
+}
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, var(--accent-color), var(--purple-light));
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 1000;
+  animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+  max-width: 300px;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.shortcut-hint {
+  font-size: 9px;
+  color: var(--subtle-color);
+  margin-top: 2px;
+  font-style: italic;
+}
+.format-guide {
+  font-size: 10px;
+  color: var(--subtle-color);
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  border: 1px dashed var(--card-border);
+}
+.format-guide-title {
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.format-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+}
+.format-example {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  padding: 2px 4px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1><i class="fas fa-crystal"></i>ROME 2D LEDGER(RLG)</h1>
+      <div class="subtitle">Goodluck everybody💶 | Support All Myanmar 2D Formats</div>
+    </div>
+    <div class="total">Total: <span id="total-amount">0</span></div>
+  </div>
+  
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="ledger">Ledgers</div>
+    <div class="tab" data-tab="add-bets">Add Ledger</div>
+    <div class="tab" data-tab="winning">Check Winning</div>
+    <div class="tab" data-tab="history">History</div>
+    <!-- NEW: 3D Mode Tab -->
+    <div class="tab" id="tab-3d-mode">
+      <i class=""></i> Switch to 3D Mode
+    </div>
+  </div>
+  
+  <!-- Ledger Card -->
+  <div class="card" id="ledger-card">
+    <div class="card-title">
+      <i class="fas fa-book"></i> Current Ledger
+      <span class="shortcut-hint">(Click number to remove)</span>
+    </div>
+    <div id="ledger-grid" class="ledger-grid"></div>
+    <div class="action-buttons">
+      <button id="btn-copy" class="small"><i class="fas fa-copy"></i> Copy Ledger</button>
+      <button id="btn-clear" class="small ghost"><i class="fas fa-trash"></i> Clear All</button>
+    </div>
+    <div class="stats">
+      <div class="stats-item"><i class="fas fa-list-ol"></i> Entries: <strong id="stat-count">0</strong></div>
+      <div class="stats-item"><i class="fas fa-coins"></i> Total Amount: <strong id="stat-sum">0</strong></div>
+      <div class="stats-item"><i class="fas fa-chart-bar"></i> Coverage: <strong id="stat-coverage">0%</strong></div>
+      <div class="stats-item"><i class="fas fa-star"></i> Max Bet: <strong id="stat-max">0</strong></div>
+    </div>
+  </div>
+  
+  <!-- Bulk Input Card -->
+  <div class="card bulk-input-card" id="bulk-card">
+    <div class="card-title">
+      <i class="fas fa-keyboard"></i> Bulk Input (Supports All Formats)
+    </div>
+    
+    <textarea id="bulk-input" rows="6" placeholder="မှန်ကန် သည့်formatများသာထည့်ပါ"></textarea>
+    
+    <div class="format-guide">
+      <div class="format-guide-title">Supported Formats:</div>
+      <div class="format-examples">
+        <div class="format-example">1ပတ်or1ပတ်ပူးပါ။စထိပ်မထိပ်စပိတ် မပိတ် စမ မစ မစRစမR မမ စစ</div>
+        
+        <div class="format-example">နက္ခတ်၊ခွေ၊ခွေပူး </div>
+        
+        
+        <div class="format-example">11R1000ဆို11=2000ထည့်</di
+        <div class="format-example">123/456=1000 (ဒဲ့)</div>
+        <div class="format-example">456/123(ကပ်Rဆိုပြောင်းပြန်ပြန်ရေးပေး)</div>
+        
+        <div class="format-example">10 to 19R500 </div>
+      </div>
+    </div>
+    
+    <div style="margin-top:10px; display:flex; gap:5px; flex-wrap: wrap;">
+      <button id="btn-submit-bulk"><i class="fas fa-check"></i> Submit Bets</button>
+      <button id="btn-clear-input" class="ghost"><i class="fas fa-eraser"></i> Clear</button>
+      <button id="btn-preview" class="ghost"><i class="fas fa-eye"></i> Preview</button>
+    </div>
+  </div>
+  
+  <!-- Remaining Card -->
+  <div class="card remaining-card">
+    <div class="card-title">
+      <i class="fas fa-list-alt"></i> Remaining Numbers
+    </div>
+    <div style="display:flex; gap:5px; margin-bottom:6px; flex-wrap: wrap;">
+      <button id="btn-show-remaining" class="small"><i class="fas fa-eye"></i> Show</button>
+      <button id="btn-copy-remaining" class="small ghost"><i class="fas fa-copy"></i> Copy</button>
+      <button id="btn-add-remaining" class="small"><i class="fas fa-plus"></i> Add All</button>
+    </div>
+    <div id="remaining-box" class="remaining-box">(Click "Show" to view numbers not in ledger)</div>
+    <div class="stats">
+      <div class="stats-item"><i class="fas fa-hashtag"></i> Remaining: <strong id="remaining-count">100</strong></div>
+      <div class="stats-item"><i class="fas fa-check-circle"></i> Covered: <strong id="covered-count">0</strong></div>
+    </div>
+  </div>
+  
+  <!-- Winning Check Card -->
+  <div class="card winning-card" id="winning-card">
+    <div class="card-title">
+      <i class="fas fa-trophy"></i> Winning Check
+    </div>
+    
+    <label>Winning Numbers (separate by space or comma)</label>
+    <textarea id="winning-input" rows="2" placeholder="Enter winning numbers (e.g., 12 34 56)"></textarea>
+    
+    <div style="margin-top: 8px;">
+      <label>Multiplier</label>
+      <select id="winning-multiplier-select" style="width: 100%;">
+        <option value="80">80x (Standard)</option>
+        <option value="85" selected>85x (Special)</option>
+        <option value="90">90x (VIP)</option>
+        <option value="95">95x (Premium)</option>
+      </select>
+    </div>
+    
+    <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+      <button id="btn-check-winning" class="small"><i class="fas fa-calculator"></i> Check Winning</button>
+      <button id="btn-clear-winning" class="small ghost"><i class="fas fa-eraser"></i> Clear</button>
+    </div>
+    
+    <div id="winning-result" style="display: none;">
+      <div id="congrats-message"></div>
+      <div style="font-size: 13px; color: var(--accent-color); margin-bottom: 5px; text-align: center;">
+        Total Win: <span id="total-win-amount" style="color: var(--gold-color);">0</span>
+      </div>
+      <div id="winning-breakdown" style="max-height: 120px; overflow: auto; font-size: 11px;"></div>
+    </div>
+  </div>
+  
+  <!-- History Card -->
+  <div class="card history-card" id="history-card">
+    <div class="card-title">
+      <i class="fas fa-history"></i> Betting History
+    </div>
+    <div class="action-buttons">
+      <button id="btn-clear-history" class="small ghost"><i class="fas fa-trash"></i> Clear History</button>
+      <!-- REMOVED: Switch to 3D Mode Button from here -->
+    </div>
+    <div id="history-list" class="history-list">
+      <div style="text-align: center; padding: 20px; color: var(--subtle-color);">
+        <i class="fas fa-clock" style="font-size: 24px; margin-bottom: 8px;"></i>
+        <div>No history yet</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div>2D Lottery Ledger Design by ROME | Support All Myanmar 2D Formats</div>
+  </footer>
+</div>
+
+<!-- Notification Container -->
+<div id="notification-container"></div>
+
+<script>
+// 2D Lottery JavaScript Code - COMPLETE VERSION WITH FIXES
+(() => {
+  const pad2 = n => (''+n).padStart(2,'0');
+  let ledger = new Map();
+  let isRemainingShown = false;
+  let currentAmount = 500;
+  let history = [];
+  
+  // Theme management
+  let currentTheme = localStorage.getItem('ledgerTheme') || 'dark';
+  
+  // DOM Elements
+  const ledgerGrid = document.getElementById('ledger-grid');
+  const statCount = document.getElementById('stat-count');
+  const statSum = document.getElementById('stat-sum');
+  const totalAmount = document.getElementById('total-amount');
+  const statCoverage = document.getElementById('stat-coverage');
+  const statMax = document.getElementById('stat-max');
+  const remainingBox = document.getElementById('remaining-box');
+  const remainingCount = document.getElementById('remaining-count');
+  const coveredCount = document.getElementById('covered-count');
+  const bulkCard = document.getElementById('bulk-card');
+  const winningCard = document.getElementById('winning-card');
+  const historyCard = document.getElementById('history-card');
+  const ledgerCard = document.getElementById('ledger-card');
+  const tabs = document.querySelectorAll('.tab');
+  const winningInput = document.getElementById('winning-input');
+  const winningMultiplierSelect = document.getElementById('winning-multiplier-select');
+  const winningResult = document.getElementById('winning-result');
+  const totalWinAmount = document.getElementById('total-win-amount');
+  const winningBreakdown = document.getElementById('winning-breakdown');
+  const congratsMessage = document.getElementById('congrats-message');
+  
+  // Add history entry
+  function addHistoryEntry(type, details) {
+    const entry = {
+      type: type,
+      details: details,
+      timestamp: Date.now()
+    };
+    history.unshift(entry);
+    if (history.length > 100) history = history.slice(0, 100);
+    localStorage.setItem('ledgerHistory2D', JSON.stringify(history));
+    updateHistoryDisplay();
+  }
+  
+  // Load saved data
+  function loadSavedData() {
+ 
+  // Load ledger
+    const savedLedger = localStorage.getItem('simpleLedger2D');
+    if(savedLedger){
+      try {
+        const obj = JSON.parse(savedLedger);
+        ledger = new Map(Object.entries(obj).map(([k,v]) => [parseInt(k), parseInt(v)]));
+      } catch(e) {
+        ledger = new Map();
+      }
+    }
+    
+    // Load history
+    const savedHistory = localStorage.getItem('ledgerHistory2D');
+    if(savedHistory){
+      try {
+        history = JSON.parse(savedHistory);
+      } catch(e) {
+        history = [];
+      }
+    }
+    
+    // Load settings
+    const savedSettings = localStorage.getItem('ledgerSettings2D');
+    if(savedSettings){
+      try {
+        const settings = JSON.parse(savedSettings);
+        if(settings.defaultAmount) {
+          currentAmount = settings.defaultAmount;
+        }
+      } catch(e) {}
+    }
+  }
+  // Show notification
+  function showNotification(message, type = 'success') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.style.background = type === 'success' ? 'linear-gradient(135deg, var(--accent-color), var(--purple-light))' : 
+                                   type === 'warning' ? 'linear-gradient(135deg, var(--gold-color), #ff8f00)' : 
+                                   'linear-gradient(135deg, var(--danger-color), #ff5252)';
+    notification.textContent = message;
+    container.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 2500);
+  }
+  
+  // Save ledger
+  function saveLedger(){ 
+    localStorage.setItem('simpleLedger2D', JSON.stringify(Object.fromEntries(ledger)));
+    localStorage.setItem('ledgerLastSave2D', Date.now().toString());
+  }
+  
+  // Update ledger display
+  function updateLedger(){
+    ledgerGrid.innerHTML = '';
+    let total = 0;
+    let maxBet = 0;
+    
+    const sorted = [...ledger].sort((a,b) => b[1] - a[1]);
+    
+    // Calculate totals
+    sorted.forEach(([num, amt]) => {
+      total += amt;
+      maxBet = Math.max(maxBet, amt);
+    });
+    
+    for(const [num, amt] of sorted){
+      const div = document.createElement('div');
+      div.className = `grid-item ${amt >= 1000 ? 'high-bet' : ''}`;
+      div.innerHTML = `
+        <div class="grid-number">${pad2(num)}</div>
+        <div class="grid-amount">${amt.toLocaleString()}</div>
+      `;
+      div.addEventListener('click', () => {
+        if(confirm(`Remove ${pad2(num)} (${amt}) from ledger?`)) {
+          addHistoryEntry('bet_removed', {
+            number: pad2(num),
+            amount: amt
+          });
+          ledger.delete(num);
+          updateLedger();
+          showNotification(`Removed ${pad2(num)}`, 'warning');
+        }
+      });
+      ledgerGrid.appendChild(div);
+    }
+    
+    const count = ledger.size;
+    statCount.textContent = count;
+    statSum.textContent = total.toLocaleString();
+    totalAmount.textContent = total.toLocaleString();
+    coveredCount.textContent = count;
+    remainingCount.textContent = 100 - count;
+    statCoverage.textContent = `${(count)}%`;
+    statMax.textContent = maxBet.toLocaleString();
+    
+    saveLedger();
+    
+    if (isRemainingShown) {
+      showRemainingNumbers();
+    }
+  }
+  
+  // Update history display
+  function updateHistoryDisplay() {
+    const historyList = document.getElementById('history-list');
+    if(history.length === 0) {
+      historyList.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: var(--subtle-color);">
+          <i class="fas fa-clock" style="font-size: 24px; margin-bottom: 8px;"></i>
+          <div>No history yet</div>
+        </div>
+      `;
+      return;
+    }
+    
+    historyList.innerHTML = '';
+    history.forEach((entry, index) => {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      const date = new Date(entry.timestamp);
+      
+      let content = '';
+      let amountText = '';
+      
+      switch(entry.type) {
+        case 'ledger_update':
+          content = `Ledger updated`;
+          amountText = `${entry.details.count} bets, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'bet_added':
+          content = `Bets added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'bet_removed':
+          content = `Bet removed: ${entry.details.number}`;
+          amountText = `${entry.details.amount}`;
+          break;
+        case 'ledger_cleared':
+          content = `Ledger cleared`;
+          amountText = ``;
+          break;
+        case 'winning_checked':
+          content = `Winning checked: ${entry.details.winnerCount} winner(s)`;
+          amountText = `Total win ${entry.details.totalWin.toLocaleString()}`;
+          break;
+        case 'remaining_added':
+          content = `Remaining added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'bulk_added':
+          content = `Bulk added: ${entry.details.lineCount} lines`;
+          amountText = `${entry.details.numbersCount} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'apa_added':
+          content = `အပါ added: ${entry.details.digit}ပတ်${entry.details.isPyu ? 'ပူးပါ' : ''}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'mateet_added':
+          content = `မထိပ် added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'sateet_added':
+          content = `စထိပ် added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'mapeit_added':
+          content = `မပိတ် added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'sapeit_added':
+          content = `စပိတ် added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'sasa_added':
+          content = `စစ added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'mama_added':
+          content = `မမ added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'sama_added':
+          content = `စမ added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'masa_added':
+          content = `မစ added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'masaR_added':
+          content = `မစR added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'power_added':
+          content = `ပါဝါ added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'nakhat_added':
+          content = `နက္ခတ် added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'nyee_ko_added':
+          content = `ညီကို added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'bk_added':
+          content = `${entry.details.digit}bk added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'apue_added':
+          content = `အပူး added`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'slash_group_added':
+          content = `Group: ${entry.details.firstGroup}/${entry.details.secondGroup}${entry.details.isR ? 'R' : '='}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'khwe_pyu_added':
+          content = `ခွေပူး added: ${entry.details.digits}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'khwe_added':
+          content = `ခွေ added: ${entry.details.digits}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'teit_added':
+          content = `ထိပ် added: ${entry.details.digits}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'peit_added':
+          content = `ပိတ် added: ${entry.details.digits}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        case 'range_added':
+          content = `Range: ${entry.details.start} to ${entry.details.end}${entry.details.method === 'r' ? 'R' : '='}`;
+          amountText = `${entry.details.count} numbers, total ${entry.details.total.toLocaleString()}`;
+          break;
+        default:
+          content = `${JSON.stringify(entry.details)}`;
+          amountText = ``;
+      }
+      
+      item.innerHTML = `
+        <div class="history-content">
+          <div class="history-numbers">${content}</div>
+          <div class="history-date">${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+        </div>
+        ${amountText ? `<div class="history-amount">${amountText}</div>` : ''}
+      `;
+      historyList.appendChild(item);
+    });
+  }
+    // Theme switching function
+  function switchTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('ledgerTheme2D', theme);
+    
+    if(theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else if(theme === 'dark') {
+      document.body.classList.remove('light-theme');
+    } else {
+      if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.body.classList.add('light-theme');
+      } else {
+        document.body.classList.remove('light-theme');
+      }
+    }
+  }
+  
+  // Permutation function for 2D (2-digit permutation)
+  function permute2(numStr){
+    const arr = numStr.split('');
+    const result = new Set();
+    
+    function permute(current, remaining) {
+      if (current.length === 2) {
+        result.add(current.join(''));
+        return;
+      }
+      
+      for (let i = 0; i < remaining.length; i++) {
+        const next = [...current, remaining[i]];
+        const newRemaining = [...remaining.slice(0, i), ...remaining.slice(i + 1)];
+        permute(next, newRemaining);
+      }
+    }
+    
+    permute([], arr);
+    return [...result].map(s => parseInt(s, 10));
+  }
+  
+  // Compute remaining numbers (00-99)
+  function computeRemaining(){
+    const rem = [];
+    for(let i = 0; i < 100; i++){ 
+      if(!ledger.has(i)) rem.push(pad2(i)); 
+    }
+    return rem;
+  }
+  
+  // Show remaining numbers
+  function showRemainingNumbers(){
+    const rem = computeRemaining();
+    let out = [];
+    for(let i = 0; i < rem.length; i += 10) {
+      out.push(rem.slice(i, i+10).join('  '));
+    }
+    remainingBox.textContent = out.join('\n');
+    isRemainingShown = true;
+    document.getElementById('btn-show-remaining').innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+  }
+    // Split numbers function for 2D
+  function splitNumbers(input) {
+    return input.split(/[\s\/\*\.,-]+/)
+      .map(n => n.trim())
+      .filter(n => /^\d{1,2}$/.test(n))
+      .map(n => parseInt(n, 10))
+      .filter(n => n >= 0 && n <= 99);
+  }
+    // ==============================
+  // ALL PARSERS FOR MYANMAR FORMATS
+  // ==============================
+  
+  // 1. Process range (1 to 10=500)
+  function processRange(line) {
+    const rangeMatch = line.match(/^(\d{1,2})\s+to\s+(\d{1,2})\s*([=r])(\d+)$/i);
+    if (!rangeMatch) return null;
+    
+    const start = parseInt(rangeMatch[1]);
+    const end = parseInt(rangeMatch[2]);
+    const method = rangeMatch[3].toLowerCase();
+    const amount = parseInt(rangeMatch[4]);
+    
+    if (start > end || start < 0 || end > 99) return null;
+    
+    return { start, end, method, amount, type: 'range' };
+  }
+  
+  // 2. Process Khwe (12ခွေ500)
+  function processKhwe(line) {
+    const khweMatch = line.match(/^([0-9]+)ခွေ(\d+)$/);
+    if (!khweMatch) return null;
+    
+    const digitsStr = khweMatch[1];
+    const amount = parseInt(khweMatch[2], 10);
+    
+    const digits = [...new Set(digitsStr.split(''))];
+    
+    if (digits.length < 2) {
+      showNotification('At least 2 digits required for Khwe', 'warning');
+      return null;
+    }
+    
+    return { digits, amount, type: 'khwe' };
+  }
+  
+  // 3. Process Apue (အပူး1000)
+  function processApue(line) {
+    const apueMatch = line.match(/^([0-9]*)အပူး(\d+)$/);
+    if (!apueMatch) return null;
+    
+    const digitsStr = apueMatch[1];
+    const amount = parseInt(apueMatch[2], 10);
+    
+    let digits;
+    if (digitsStr === '') {
+      digits = ['0','1','2','3','4','5','6','7','8','9'];
+    } else {
+      digits = [...new Set(digitsStr.split(''))];
+    }
+    
+    return { digits, amount, type: 'apue' };
+  }
+  
+  // 4. Process Teit (1ထိပ်500)
+  function processTeit(line) {
+    const teitMatch = line.match(/^([0-9]+)ထိပ်(\d+)$/);
+    if (!teitMatch) return null;
+    
+    const digitsStr = teitMatch[1];
+    const amount = parseInt(teitMatch[2], 10);
+    
+    const digits = [...new Set(digitsStr.split(''))];
+    
+    if (digits.length === 0) return null;
+    
+    return { digits, amount, type: 'teit' };
+  }
+  
+  // 5. Process Peit (1ပိတ်500)
+  function processPeit(line) {
+    const peitMatch = line.match(/^([0-9]+)ပိတ်(\d+)$/);
+    if (!peitMatch) return null;
+    
+    const digitsStr = peitMatch[1];
+    const amount = parseInt(peitMatch[2], 10);
+    
+    const digits = [...new Set(digitsStr.split(''))];
+    
+    if (digits.length === 0) return null;
+    
+    return { digits, amount, type: 'peit' };
+  }
+  
+  // 6. Process MaPeit (မပိတ်1000) - All numbers ending with odd digit
+  function processMaPeit(line) {
+    const maPeitMatch = line.match(/^မပိတ်(\d+)$/);
+    if (!maPeitMatch) return null;
+    
+    const amount = parseInt(maPeitMatch[1], 10);
+    const numbers = [];
+    
+    // All numbers ending with odd digit (1,3,5,7,9)
+    for (let tens = 0; tens <= 9; tens++) {
+      for (let units = 1; units <= 9; units += 2) {
+        numbers.push(tens * 10 + units);
+      }
+    }
+    
+    return { 
+      type: 'maPeit', 
+      numbers, 
+      amount 
+    };
+  }
+  
+  // 7. Process SaPeit (စပိတ်1000) - All numbers ending with even digit  
+  function processSaPeit(line) {
+    const saPeitMatch = line.match(/^စပိတ်(\d+)$/);
+    if (!saPeitMatch) return null;
+    
+    const amount = parseInt(saPeitMatch[1], 10);
+    const numbers = [];
+    
+    // All numbers ending with even digit (0,2,4,6,8)
+    for (let tens = 0; tens <= 9; tens++) {
+      for (let units = 0; units <= 8; units += 2) {
+        numbers.push(tens * 10 + units);
+      }
+    }
+    
+    return { 
+      type: 'saPeit', 
+      numbers, 
+      amount 
+    };
+  }
+  
+  // 8. Process SaSa (စစ1000) - All even-even pairs
+  function processSaSa(line) {
+    const saSaMatch = line.match(/^စစ(\d+)$/);
+    if (!saSaMatch) return null;
+    
+    const amount = parseInt(saSaMatch[1], 10);
+    const numbers = [];
+    
+    // Even digits: 0, 2, 4, 6, 8
+    const evenDigits = [0, 2, 4, 6, 8];
+    
+    // Generate all even-even pairs
+    evenDigits.forEach(tens => {
+      evenDigits.forEach(units => {
+        numbers.push(tens * 10 + units);
+      });
+    });
+    
+    return { 
+      type: 'saSa', 
+      numbers, 
+      amount 
+    };
+  }
+  
+  // 9. Process MaMa (မမ1000) - All odd-odd pairs  
+  function processMaMa(line) {
+    const maMaMatch = line.match(/^မမ(\d+)$/);
+    if (!maMaMatch) return null;
+    
+    const amount = parseInt(maMaMatch[1], 10);
+    const numbers = [];
+    
+    // Odd digits: 1, 3, 5, 7, 9
+    const oddDigits = [1, 3, 5, 7, 9];
+    
+    // Generate all odd-odd pairs
+    oddDigits.forEach(tens => {
+      oddDigits.forEach(units => {
+        numbers.push(tens * 10 + units);
+      });
+    });
+    
+    return { 
+      type: 'maMa', 
+      numbers, 
+      amount 
+    };
+  }
+  
+  // 10. Process direct numbers with = or R method
+  function processDirectAndR(line) {
+    line = line.trim();
+    
+    // = method for group betting (12 34 56=500)
+    const eqMethodMatch = line.match(/^([\d\s\/\*\.,-]+)=(\d+)$/);
+    if (eqMethodMatch) {
+      const numbersStr = eqMethodMatch[1];
+      const amount = parseInt(eqMethodMatch[2], 10);
+      const numbers = splitNumbers(numbersStr);
+      
+      if (numbers.length === 0) return null;
+      
+      return { type: 'eqMethod', numbers, amount };
+    }
+    
+    // R method for group betting (12 34 56R500)
+    const rMethodMatch = line.match(/^([\d\s\/\*\.,-]+)r(\d+)$/i);
+    if (rMethodMatch) {
+      const numbersStr = rMethodMatch[1];
+      const amount = parseInt(rMethodMatch[2], 10);
+      const allNumbers = [];
+      
+      const baseNumbers = splitNumbers(numbersStr);
+      
+      if (baseNumbers.length === 0) return null;
+      
+      // For each number, generate permutations
+      baseNumbers.forEach(num => {
+        const numStr = pad2(num);
+        const permutations = permute2(numStr);
+        allNumbers.push(...permutations);
+      });
+      
+      return { type: 'rMethod', numbers: allNumbers, amount };
+    }
+    
+    return null;
+  }
+  
+  // 11. Process Apa (1ပတ်1000)
+  function processApa(line) {
+    const apaMatch = line.match(/^(\d)ပတ်(ပူးပါ)?(\d+)$/);
+    if (!apaMatch) return null;
+    
+    const digit = parseInt(apaMatch[1]);
+    const isPyu = apaMatch[2] === 'ပူးပါ';
+    const amount = parseInt(apaMatch[3]);
+    
+    const numbers = [];
+    for (let i = 0; i < 100; i++) {
+      const tens = Math.floor(i / 10);
+      const units = i % 10;
+      if (tens === digit || units === digit) {
+        numbers.push(i);
+      }
+    }
+    
+    // If pyu, add duplicate 11 for digit 1
+    if (isPyu && digit === 1) {
+      numbers.push(11);
+    }
+    
+    return { type: 'apa', numbers, amount, digit, isPyu };
+  }
+  
+  // 12. Process MaTeet (မထိပ်1000)
+  function processMaTeet(line) {
+    const maTeetMatch = line.match(/^မထိပ်(\d+)$/);
+    if (!maTeetMatch) return null;
+    
+    const amount = parseInt(maTeetMatch[1]);
+    const numbers = [];
+    
+    // Odd top: 1,3,5,7,9
+    for (let tens = 1; tens <= 9; tens += 2) {
+      for (let units = 0; units <= 9; units++) {
+        numbers.push(tens * 10 + units);
+      }
+    }
+    
+    return { type: 'maTeet', numbers, amount };
+  }
+  
+  // 13. Process SaTeet (စထိပ်1000)
+  function processSaTeet(line) {
+    const saTeetMatch = line.match(/^စထိပ်(\d+)$/);
+    if (!saTeetMatch) return null;
+    
+    const amount = parseInt(saTeetMatch[1]);
+    const numbers = [];
+    
+    // Even top: 0,2,4,6,8
+    for (let tens = 0; tens <= 8; tens += 2) {
+      for (let units = 0; units <= 9; units++) {
+        numbers.push(tens * 10 + units);
+      }
+    }
+    
+    return { type: 'saTeet', numbers, amount };
+  }
+  
+  // 14. Process SaMa (စမ1000)
+  function processSaMa(line) {
+    const saMaMatch = line.match(/^စမ(\d+)$/);
+    if (!saMaMatch) return null;
+    
+    const amount = parseInt(saMaMatch[1]);
+    const numbers = [];
+    
+    // Even top + Odd bottom
+    for (let tens = 0; tens <= 8; tens += 2) {
+      for (let units = 1; units <= 9; units += 2) {
+        numbers.push(tens * 10 + units);
+      }
+    }
+    
+    return { type: 'saMa', numbers, amount };
+  }
+  
+  // 15. Process MaSa (မစ1000)
+  function processMaSa(line) {
+    const maSaMatch = line.match(/^မစ(\d+)$/);
+    if (!maSaMatch) return null;
+    
+    const amount = parseInt(maSaMatch[1]);
+    const numbers = [];
+    
+    // Odd top + Even bottom
+    for (let tens = 1; tens <= 9; tens += 2) {
+      for (let units = 0; units <= 8; units += 2) {
+        numbers.push(tens * 10 + units);
+      }
+    }
+    
+    return { type: 'maSa', numbers, amount };
+  }
+  
+  // 16. Process MaSaR or SaMaR (မစR1000, စမR1000)
+  function processMaSaOrSaMaR(line) {
+    const rMatch = line.match(/^(မစ|စမ)R(\d+)$/);
+    if (!rMatch) return null;
+    
+    const type = rMatch[1];
+    const amount = parseInt(rMatch[2]);
+    const numbers = [];
+    
+    // Both even-odd and odd-even (50 combinations)
+    for (let tens = 0; tens <= 9; tens++) {
+      for (let units = 0; units <= 9; units++) {
+        // Check if tens and units have different parity
+        if ((tens % 2) !== (units % 2)) {
+          numbers.push(tens * 10 + units);
+        }
+      }
+    }
+    
+    return { type: 'maSaR', numbers, amount, originalType: type };
+  }
+  
+  // 17. Process Power (ပါဝါ1000)
+  function processPower(line) {
+    const powerMatch = line.match(/^ပါဝါ(\d+)$/);
+    if (!powerMatch) return null;
+    
+    const amount = parseInt(powerMatch[1]);
+    const powerNumbers = [5, 50, 16, 61, 27, 72, 38, 83, 49, 94];
+    
+    return { type: 'power', numbers: powerNumbers, amount };
+  }
+  
+  // 18. Process Nakhat (နက္ခတ်1000)
+  function processNakhat(line) {
+    const nakhatMatch = line.match(/^နက္ခတ်(\d+)$/);
+    if (!nakhatMatch) return null;
+    
+    const amount = parseInt(nakhatMatch[1]);
+    const nakhatNumbers = [7, 70, 18, 81, 24, 42, 53, 35, 69, 96];
+    
+    return { type: 'nakhat', numbers: nakhatNumbers, amount };
+  }
+  
+  // 19. Process Nyee Ko (ညီကို1000)
+  function processNyeeKo(line) {
+    const nyeeKoMatch = line.match(/^ညီကို(\d+)$/);
+    if (!nyeeKoMatch) return null;
+    
+    const amount = parseInt(nyeeKoMatch[1], 10);
+    const numbers = [];
+    
+    // Consecutive digit pairs from 0-1 to 8-9
+    for (let i = 0; i <= 8; i++) {
+      const j = i + 1;
+      
+      // Forward: ij
+      const forward = i * 10 + j;
+      numbers.push(forward);
+      
+      // Reverse: ji
+      const reverse = j * 10 + i;
+      numbers.push(reverse);
+    }
+    
+    // Special pair: 09 and 90
+    numbers.push(9);   // 09
+    numbers.push(90);  // 90
+    
+    return { 
+      type: 'nyeeKo', 
+      numbers, 
+      amount 
+    };
+  }
+  
+  // 20. Process BK (0bk1000 to 9bk1000)
+  function processBK(line) {
+    const bkMatch = line.match(/^(\d)bk(\d+)$/i);
+    if (!bkMatch) return null;
+    
+    const digit = parseInt(bkMatch[1]);
+    const amount = parseInt(bkMatch[2]);
+    
+    // BK tables based on the input
+    const bkTables = {
+      0: [0, 19, 91, 28, 82, 37, 73, 46, 64, 55],
+      1: [10, 1, 29, 92, 38, 83, 47, 74, 56, 65],
+      2: [11, 20, 2, 39, 93, 48, 84, 57, 75, 66],
+      3: [3, 30, 12, 21, 49, 94, 58, 85, 67, 76],
+      4: [4, 40, 13, 31, 22, 59, 95, 68, 86, 77],
+      5: [5, 50, 14, 41, 23, 32, 69, 96, 78, 87],
+      6: [6, 60, 15, 51, 24, 42, 33, 79, 97, 88],
+      7: [7, 70, 16, 61, 25, 52, 34, 43, 89, 98],
+      8: [8, 80, 17, 71, 26, 62, 35, 53, 44, 99],
+      9: [9, 90, 18, 81, 27, 72, 36, 63, 45, 54]
+    };
+    
+    if (bkTables.hasOwnProperty(digit)) {
+      return { type: 'bk', numbers: bkTables[digit], amount, digit };
+    }
+    
+    return null;
+  }
+  
+  // 21. Process Slash Group (123/456=1000 or 123/456R1000) - FIXED VERSION
+  function processSlashGroup(line) {
+    const slashMatch = line.match(/^([\d\/]+)(R?)=(\d+)$/i);
+    if (!slashMatch) return null;
+    
+    const groupStr = slashMatch[1];
+    const isR = slashMatch[2].toUpperCase() === 'R';
+    const amount = parseInt(slashMatch[3]);
+    
+    // Split groups: 123/456 -> ['123', '456']
+    const groups = groupStr.split('/');
+    if (groups.length !== 2) return null;
+    
+    const firstGroup = groups[0].split('').map(d => parseInt(d));
+    const secondGroup = groups[1].split('').map(d => parseInt(d));
+    
+    const numbers = [];
+        // Generate all cross combinations - FIXED LOGIC
+    firstGroup.forEach(firstDigit => {
+      secondGroup.forEach(secondDigit => {
+        if (isR) {
+          // R mode: add both forward and reverse (but avoid duplicates)
+          const forward = firstDigit * 10 + secondDigit;
+          const reverse = secondDigit * 10 + firstDigit;
+          
+          numbers.push(forward);
+          if (forward !== reverse) { // Only add reverse if it's different
+            numbers.push(reverse);
+          }
+        } else {
+          // = mode: only add forward
+          const forward = firstDigit * 10 + secondDigit;
+          numbers.push(forward);
+        }
+      });
+    });
+        // Remove duplicates (in case any duplicate pairs exist)
+    const uniqueNumbers = [...new Set(numbers)];
+    
+    return { 
+      type: 'slashGroup', 
+      numbers: uniqueNumbers, 
+      amount, 
+      isR,
+      firstGroup: groups[0],
+      secondGroup: groups[1]
+    };
+  }
+  
+  // 22. Process Khwe Pyu (1234ခွေပူး1000)
+  function processKhwePyu(line) {
+    const khwePyuMatch = line.match(/^([0-9]+)ခွေပူး(\d+)$/);
+    if (!khwePyuMatch) return null;
+    
+    const digitsStr = khwePyuMatch[1];
+    const amount = parseInt(khwePyuMatch[2], 10);
+    
+    const digits = [...new Set(digitsStr.split('').map(d => parseInt(d)))];
+    
+    if (digits.length < 2) {
+      showNotification('At least 2 digits required for Khwe Pyu', 'warning');
+      return null;
+    }
+    
+    const numbers = [];
+    const n = digits.length;
+    
+    // 1. Generate all permutations (nP2 = n*(n-1))
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i !== j) {
+          const num = digits[i] * 10 + digits[j];
+          numbers.push(num);
+        }
+      }
+    }
+    
+    // 2. Add same-digit pairs (အပူး)
+    digits.forEach(digit => {
+      const sameDigitNum = digit * 10 + digit;
+      numbers.push(sameDigitNum);
+    });
+    
+    return { 
+      type: 'khwePyu', 
+      numbers, 
+      amount, 
+      digits: digitsStr,
+      digitCount: digits.length 
+    };
+  }
+    // Initialize
+  function init() {
+    loadSavedData();
+    updateLedger();
+    switchTheme(currentTheme);
+    updateHistoryDisplay();
+  }
+  
+  // Tab switching
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.dataset.tab;
+      
+      // Check if it's the 3D Mode tab
+      if (tab.id === 'tab-3d-mode') {
+        // Navigate to 3D page
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      // Show/hide cards based on selected tab
+      if (tabName === 'ledger') {
+        ledgerCard.style.display = 'block';
+        bulkCard.style.display = 'none';
+        winningCard.style.display = 'none';
+        historyCard.style.display = 'none';
+      } else if (tabName === 'add-bets') {
+        ledgerCard.style.display = 'none';
+        bulkCard.style.display = 'block';
+        winningCard.style.display = 'none';
+        historyCard.style.display = 'none';
+      } else if (tabName === 'winning') {
+        ledgerCard.style.display = 'none';
+        bulkCard.style.display = 'none';
+        winningCard.style.display = 'block';
+        historyCard.style.display = 'none';
+      } else if (tabName === 'history') {
+        ledgerCard.style.display = 'none';
+        bulkCard.style.display = 'none';
+        winningCard.style.display = 'none';
+        historyCard.style.display = 'block';
+        updateHistoryDisplay();
+      }
+      
+      if (tabName !== 'winning') {
+        winningResult.style.display = 'none';
+      }
+    });
+  });
+  
+  // Submit bulk bets with ALL formats
+  document.getElementById('btn-submit-bulk').addEventListener('click', () => {
+    const text = document.getElementById('bulk-input').value.trim();
+    if (!text) {
+      showNotification('Please enter some bets', 'warning');
+      return;
+    }
+    
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    let addedCount = 0;
+    let totalAdded = 0;
+    let numbersAdded = 0;
+    
+    lines.forEach(line => {
+      let processed = false;
+      
+      // Try all specific formats in order
+      
+      // 1. Apa (1ပတ်1000)
+      const apaInfo = processApa(line);
+      if (apaInfo && !processed) {
+        apaInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + apaInfo.amount);
+          totalAdded += apaInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('apa_added', {
+          digit: apaInfo.digit,
+          isPyu: apaInfo.isPyu,
+          count: apaInfo.numbers.length,
+          total: apaInfo.numbers.length * apaInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 2. MaTeet (မထိပ်1000)
+      const maTeetInfo = processMaTeet(line);
+      if (maTeetInfo && !processed) {
+        maTeetInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + maTeetInfo.amount);
+          totalAdded += maTeetInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('mateet_added', {
+          count: maTeetInfo.numbers.length,
+          total: maTeetInfo.numbers.length * maTeetInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 3. SaTeet (စထိပ်1000)
+      const saTeetInfo = processSaTeet(line);
+      if (saTeetInfo && !processed) {
+        saTeetInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + saTeetInfo.amount);
+          totalAdded += saTeetInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('sateet_added', {
+          count: saTeetInfo.numbers.length,
+          total: saTeetInfo.numbers.length * saTeetInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 4. MaPeit (မပိတ်1000)
+      const maPeitInfo = processMaPeit(line);
+      if (maPeitInfo && !processed) {
+        maPeitInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + maPeitInfo.amount);
+          totalAdded += maPeitInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('mapeit_added', {
+          count: maPeitInfo.numbers.length,
+          total: maPeitInfo.numbers.length * maPeitInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 5. SaPeit (စပိတ်1000)
+      const saPeitInfo = processSaPeit(line);
+      if (saPeitInfo && !processed) {
+        saPeitInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + saPeitInfo.amount);
+          totalAdded += saPeitInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('sapeit_added', {
+          count: saPeitInfo.numbers.length,
+          total: saPeitInfo.numbers.length * saPeitInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 6. SaSa (စစ1000)
+      const saSaInfo = processSaSa(line);
+      if (saSaInfo && !processed) {
+        saSaInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + saSaInfo.amount);
+          totalAdded += saSaInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('sasa_added', {
+          count: saSaInfo.numbers.length,
+          total: saSaInfo.numbers.length * saSaInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 7. MaMa (မမ1000)
+      const maMaInfo = processMaMa(line);
+      if (maMaInfo && !processed) {
+        maMaInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + maMaInfo.amount);
+          totalAdded += maMaInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('mama_added', {
+          count: maMaInfo.numbers.length,
+          total: maMaInfo.numbers.length * maMaInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 8. SaMa (စမ1000)
+      const saMaInfo = processSaMa(line);
+      if (saMaInfo && !processed) {
+        saMaInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + saMaInfo.amount);
+          totalAdded += saMaInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('sama_added', {
+          count: saMaInfo.numbers.length,
+          total: saMaInfo.numbers.length * saMaInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 9. MaSa (မစ1000)
+      const maSaInfo = processMaSa(line);
+      if (maSaInfo && !processed) {
+        maSaInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + maSaInfo.amount);
+          totalAdded += maSaInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('masa_added', {
+          count: maSaInfo.numbers.length,
+          total: maSaInfo.numbers.length * maSaInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 10. MaSaR or SaMaR (မစR1000, စမR1000)
+      const maSaRInfo = processMaSaOrSaMaR(line);
+      if (maSaRInfo && !processed) {
+        maSaRInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + maSaRInfo.amount);
+          totalAdded += maSaRInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('masaR_added', {
+          count: maSaRInfo.numbers.length,
+          total: maSaRInfo.numbers.length * maSaRInfo.amount,
+          originalType: maSaRInfo.originalType
+        });
+        processed = true;
+      }
+      
+      // 11. Power (ပါဝါ1000)
+      const powerInfo = processPower(line);
+      if (powerInfo && !processed) {
+        powerInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + powerInfo.amount);
+          totalAdded += powerInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('power_added', {
+          count: powerInfo.numbers.length,
+          total: powerInfo.numbers.length * powerInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 12. Nakhat (နက္ခတ်1000)
+      const nakhatInfo = processNakhat(line);
+      if (nakhatInfo && !processed) {
+        nakhatInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + nakhatInfo.amount);
+          totalAdded += nakhatInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('nakhat_added', {
+          count: nakhatInfo.numbers.length,
+          total: nakhatInfo.numbers.length * nakhatInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 13. Nyee Ko (ညီကို1000)
+      const nyeeKoInfo = processNyeeKo(line);
+      if (nyeeKoInfo && !processed) {
+        nyeeKoInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + nyeeKoInfo.amount);
+          totalAdded += nyeeKoInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('nyee_ko_added', {
+          count: nyeeKoInfo.numbers.length,
+          total: nyeeKoInfo.numbers.length * nyeeKoInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 14. BK (0bk-9bk)
+      const bkInfo = processBK(line);
+      if (bkInfo && !processed) {
+        bkInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + bkInfo.amount);
+          totalAdded += bkInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('bk_added', {
+          digit: bkInfo.digit,
+          count: bkInfo.numbers.length,
+          total: bkInfo.numbers.length * bkInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 15. Apue (အပူး1000)
+      const apueInfo = processApue(line);
+      if (apueInfo && !processed) {
+        apueInfo.digits.forEach(digit => {
+          const num = parseInt(digit + digit, 10);
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + apueInfo.amount);
+          totalAdded += apueInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('apue_added', {
+          digits: apueInfo.digits.join(''),
+          count: apueInfo.digits.length,
+          total: apueInfo.digits.length * apueInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 16. Slash Group (123/456=1000 or 123/456R1000) - FIXED
+      const slashGroupInfo = processSlashGroup(line);
+      if (slashGroupInfo && !processed) {
+        slashGroupInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + slashGroupInfo.amount);
+          totalAdded += slashGroupInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('slash_group_added', {
+          firstGroup: slashGroupInfo.firstGroup,
+          secondGroup: slashGroupInfo.secondGroup,
+          isR: slashGroupInfo.isR,
+          count: slashGroupInfo.numbers.length,
+          total: slashGroupInfo.numbers.length * slashGroupInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 17. Khwe Pyu (1234ခွေပူး1000)
+      const khwePyuInfo = processKhwePyu(line);
+      if (khwePyuInfo && !processed) {
+        khwePyuInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + khwePyuInfo.amount);
+          totalAdded += khwePyuInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        addHistoryEntry('khwe_pyu_added', {
+          digits: khwePyuInfo.digits,
+          digitCount: khwePyuInfo.digitCount,
+          count: khwePyuInfo.numbers.length,
+          total: khwePyuInfo.numbers.length * khwePyuInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 18. Range (1 to 10=500)
+      const rangeInfo = processRange(line);
+      if (rangeInfo && !processed) {
+        for (let num = rangeInfo.start; num <= rangeInfo.end; num++) {
+          if (rangeInfo.method === 'r') {
+            const perms = permute2(pad2(num));
+            perms.forEach(permNum => {
+              const existing = ledger.get(permNum) || 0;
+              ledger.set(permNum, existing + rangeInfo.amount);
+              totalAdded += rangeInfo.amount;
+              numbersAdded++;
+            });
+          } else {
+            const existing = ledger.get(num) || 0;
+            ledger.set(num, existing + rangeInfo.amount);
+            totalAdded += rangeInfo.amount;
+            numbersAdded++;
+          }
+        }
+        addedCount++;
+        addHistoryEntry('range_added', {
+          start: rangeInfo.start,
+          end: rangeInfo.end,
+          method: rangeInfo.method,
+          count: numbersAdded,
+          total: totalAdded
+        });
+        processed = true;
+      }
+      
+      // 19. Khwe (12ခွေ500)
+      const khweInfo = processKhwe(line);
+      if (khweInfo && !processed) {
+        const uniqueDigits = [...new Set(khweInfo.digits)];
+        const n = uniqueDigits.length;
+        
+        if (n >= 2) {
+          for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+              if (j === i) continue;
+              const numStr = uniqueDigits[i] + uniqueDigits[j];
+              const num = parseInt(numStr, 10);
+              const existing = ledger.get(num) || 0;
+              ledger.set(num, existing + khweInfo.amount);
+              totalAdded += khweInfo.amount;
+              numbersAdded++;
+            }
+          }
+          addedCount++;
+          addHistoryEntry('khwe_added', {
+            digits: khweInfo.digits.join(''),
+            count: n * (n - 1),
+            total: (n * (n - 1)) * khweInfo.amount
+          });
+          processed = true;
+        }
+      }
+      
+      // 20. Teit (1ထိပ်500)
+      const teitInfo = processTeit(line);
+      if (teitInfo && !processed) {
+        teitInfo.digits.forEach(digit => {
+          for (let j = 0; j <= 9; j++) {
+            const num = parseInt(digit + j, 10);
+            const existing = ledger.get(num) || 0;
+            ledger.set(num, existing + teitInfo.amount);
+            totalAdded += teitInfo.amount;
+            numbersAdded++;
+          }
+        });
+        addedCount++;
+        addHistoryEntry('teit_added', {
+          digits: teitInfo.digits.join(''),
+          count: teitInfo.digits.length * 10,
+          total: (teitInfo.digits.length * 10) * teitInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 21. Peit (1ပိတ်500)
+      const peitInfo = processPeit(line);
+      if (peitInfo && !processed) {
+        peitInfo.digits.forEach(digit => {
+          for (let i = 0; i <= 9; i++) {
+            const num = parseInt(i + digit, 10);
+            const existing = ledger.get(num) || 0;
+            ledger.set(num, existing + peitInfo.amount);
+            totalAdded += peitInfo.amount;
+            numbersAdded++;
+          }
+        });
+        addedCount++;
+        addHistoryEntry('peit_added', {
+          digits: peitInfo.digits.join(''),
+          count: peitInfo.digits.length * 10,
+          total: (peitInfo.digits.length * 10) * peitInfo.amount
+        });
+        processed = true;
+      }
+      
+      // 22. Direct and R method (12 34 56=500, 12 34 56R500)
+      const directAndRInfo = processDirectAndR(line);
+      if (directAndRInfo && !processed) {
+        directAndRInfo.numbers.forEach(num => {
+          const existing = ledger.get(num) || 0;
+          ledger.set(num, existing + directAndRInfo.amount);
+          totalAdded += directAndRInfo.amount;
+          numbersAdded++;
+        });
+        addedCount++;
+        processed = true;
+      }
+            // 23. If no special format, treat as individual numbers with amount at end
+      if (!processed) {
+        const parts = line.split(/\s+/);
+        if (parts.length >= 2) {
+          const amount = parseInt(parts[parts.length - 1]);
+          if (!isNaN(amount)) {
+            const numberParts = parts.slice(0, parts.length - 1);
+            const numbers = splitNumbers(numberParts.join(' '));
+            if (numbers.length > 0) {
+              numbers.forEach(n => {
+                const existing = ledger.get(n) || 0;
+                ledger.set(n, existing + amount);
+                totalAdded += amount;
+                numbersAdded++;
+              });
+              addedCount++;
+              processed = true;
+            }
+          }
+        }
+      }
+      
+      // 24. Last resort: split numbers and use default amount
+      if (!processed) {
+        const nums = splitNumbers(line);
+        if (nums.length > 0) {
+          const amount = currentAmount;
+          nums.forEach(n => {
+            const existing = ledger.get(n) || 0;
+            ledger.set(n, existing + amount);
+            totalAdded += amount;
+            numbersAdded++;
+          });
+          addedCount++;
+          processed = true;
+        }
+      }
+      
+      if (!processed) {
+        console.log(`Could not parse line: ${line}`);
+      }
+    });
+    
+    updateLedger();
+    
+    // Add to history
+    if (numbersAdded > 0) {
+      addHistoryEntry('bulk_added', {
+        lineCount: addedCount,
+        numbersCount: numbersAdded,
+        total: totalAdded
+      });
+    }
+    
+    showNotification(`Added ${addedCount} line(s) | Total: ${totalAdded.toLocaleString()}`);
+    
+    document.getElementById('bulk-input').value = '';
+    
+    // Switch to ledger tab
+    tabs.forEach(t => t.classList.remove('active'));
+    tabs[0].classList.add('active');
+    ledgerCard.style.display = 'block';
+    bulkCard.style.display = 'none';
+    winningCard.style.display = 'none';
+    historyCard.style.display = 'none';
+  });
+  
+  // Clear input
+  document.getElementById('btn-clear-input').addEventListener('click', () => {
+    if (confirm('Clear input textarea?')) {
+      document.getElementById('bulk-input').value = '';
+    }
+  });
+  
+  // Preview button
+  document.getElementById('btn-preview').addEventListener('click', () => {
+    const text = document.getElementById('bulk-input').value.trim();
+    if (!text) {
+      showNotification('Please enter some bets to preview', 'warning');
+      return;
+    }
+    
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    let previewText = 'Preview of bets:\n\n';
+    
+    lines.forEach((line, index) => {
+      previewText += `${index + 1}. ${line}\n`;
+    });
+    
+    previewText += `\nTotal lines: ${lines.length}`;
+    
+    alert(previewText);
+  });
+  
+  // Show remaining numbers
+  document.getElementById('btn-show-remaining').addEventListener('click', () => {
+    if (!isRemainingShown) {
+      showRemainingNumbers();
+    } else {
+      remainingBox.textContent = '(Click "Show" to view numbers not in ledger)';
+      isRemainingShown = false;
+      document.getElementById('btn-show-remaining').innerHTML = '<i class="fas fa-eye"></i> Show';
+    }
+  });
+  
+  // Copy remaining numbers
+  document.getElementById('btn-copy-remaining').addEventListener('click', async () => {
+    const text = remainingBox.textContent.trim();
+    if (!text || text.includes('Click "Show"')) {
+      showNotification('No remaining numbers to copy', 'warning');
+      return;
+    }
+    await navigator.clipboard.writeText(text);
+    showNotification('Remaining numbers copied to clipboard');
+  });
+  
+// Add all remaining numbers
+  document.getElementById('btn-add-remaining').addEventListener('click', () => {
+    const rem = computeRemaining();
+    const amount = currentAmount;
+    
+    if (rem.length === 0) {
+      showNotification('No remaining numbers to add', 'warning');
+      return;
+    }
+    
+    if (confirm(`Add all ${rem.length} remaining numbers with amount ${amount} each?\nTotal: ${(rem.length * amount).toLocaleString()}`)) {
+      rem.forEach(numStr => {
+        const num = parseInt(numStr, 10);
+        const existing = ledger.get(num) || 0;
+        ledger.set(num, existing + amount);
+      });
+      updateLedger();
+      
+      // Add to history
+      addHistoryEntry('remaining_added', {
+        count: rem.length,
+        total: rem.length * amount
+      });
+      
+      showNotification(`Added ${rem.length} numbers to ledger`);
+    }
+  });
+  
+  // Copy ledger
+  document.getElementById('btn-copy').addEventListener('click', async () => {
+    if (ledger.size === 0) {
+      showNotification('Ledger is empty', 'warning');
+      return;
+    }
+    const lines = [...ledger].map(([n,a]) => `${pad2(n)} ${a}`).join('\n');
+    await navigator.clipboard.writeText(lines);
+    showNotification('Ledger copied to clipboard');
+  });
+  
+  // Clear ledger
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    if (!confirm('Clear all ledger entries? This cannot be undone.')) return;
+    
+    addHistoryEntry('ledger_cleared', {});
+    ledger.clear();
+    updateLedger();
+    showNotification('Ledger cleared', 'warning');
+  });
+  
+  // Clear winning input
+  document.getElementById('btn-clear-winning').addEventListener('click', () => {
+    winningInput.value = '';
+    winningMultiplierSelect.value = '85';
+    winningResult.style.display = 'none';
+  });
+  
+  // Check winning numbers
+  document.getElementById('btn-check-winning').addEventListener('click', () => {
+    const numbersText = winningInput.value.trim();
+    if (!numbersText) {
+      showNotification('Please enter winning numbers', 'warning');
+      return;
+    }
+    
+    // Split by space or comma and filter valid numbers
+    const numbers = numbersText.split(/[,\s]+/)
+      .map(n => n.trim())
+      .filter(n => /^\d{1,2}$/.test(n))
+      .map(n => {
+        const num = parseInt(n, 10);
+        return num;
+      })
+      .filter(n => n >= 0 && n <= 99);
+    
+    if (numbers.length === 0) {
+      showNotification('No valid numbers found (00-99 only)', 'warning');
+      return;
+    }
+    
+    const multiplier = parseInt(winningMultiplierSelect.value);
+    
+    let totalWin = 0;
+    let breakdown = [];
+    let hasWinner = false;
+    let winnerCount = 0;
+    
+    numbers.forEach(num => {
+      const ledgerAmount = ledger.get(num) || 0;
+      if (ledgerAmount > 0) {
+        const winForThisNumber = ledgerAmount * multiplier;
+        totalWin += winForThisNumber;
+        breakdown.push(`
+          <div class="winning-item">
+            <span>${pad2(num)}</span>
+            <span>${ledgerAmount} × ${multiplier} = <span class="win-amount">${winForThisNumber.toLocaleString()}</span></span>
+          </div>
+        `);
+        hasWinner = true;
+        winnerCount++;
+      } else {
+        breakdown.push(`
+          <div class="winning-item no-winner">
+            <span>${pad2(num)}</span>
+            <span>No bet (0)</span>
+          </div>
+        `);
+      }
+    });
+    
+    totalWinAmount.textContent = totalWin.toLocaleString();
+    winningBreakdown.innerHTML = breakdown.join('');
+    
+    if (hasWinner) {
+      congratsMessage.innerHTML = `🎉 Congratulations! ${winnerCount} winning number(s) 🎉`;
+      winningResult.style.display = 'block';
+      
+      // Add to history
+      if(winnerCount > 0) {
+        addHistoryEntry('winning_checked', {
+          winnerCount: winnerCount,
+          totalWin: totalWin,
+          multiplier: multiplier,
+          numbers: numbers.map(n => pad2(n))
+        });
+      }
+    } else {
+      congratsMessage.innerHTML = `<span style="color: var(--danger-color);">No winning numbers found in ledger</span>`;
+      winningResult.style.display = 'block';
+    }
+    
+    // Scroll to result
+    winningResult.scrollIntoView({ behavior: 'smooth' });
+  });
+  
+  // Clear history
+  document.getElementById('btn-clear-history').addEventListener('click', () => {
+    if (!confirm('Clear all history? This cannot be undone.')) return;
+    
+    history = [];
+    localStorage.removeItem('ledgerHistory2D');
+    updateHistoryDisplay();
+    
+    showNotification('History cleared', 'warning');
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+S to save
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault();
+      saveLedger();
+      showNotification('Ledger saved');
+    }
+    
+    // Ctrl+C to copy ledger
+    if (e.ctrlKey && e.key === 'c') {
+      if (ledger.size > 0) {
+        e.preventDefault();
+        document.getElementById('btn-copy').click();
+      }
+    }
+    
+    // Ctrl+L to clear ledger
+    if (e.ctrlKey && e.key === 'l') {
+      e.preventDefault();
+      document.getElementById('btn-clear').click();
+    }
+    
+    // Ctrl+1-4 to switch tabs
+    if (e.ctrlKey && e.key >= '1' && e.key <= '4') {
+      e.preventDefault();
+      const tabIndex = parseInt(e.key) - 1;
+      if (tabs[tabIndex]) {
+        tabs[tabIndex].click();
+      }
+    }
+    
+    // Esc to close notifications
+    if (e.key === 'Escape') {
+      const notifications = document.querySelectorAll('.notification');
+      notifications.forEach(notification => notification.remove());
+    }
+  });
+  
+  // Initialize the application
+  init();
+})();
+</script>
+</body>
+</html>

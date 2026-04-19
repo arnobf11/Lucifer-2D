@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Rome 3D Ledger V9.0 | Myanmar Font + Group Input + Deduct Copy</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ========== DARK THEME ========== */
+:root {
+  --bg-primary: radial-gradient(circle at top left, #1c1c2e, #0b0b1a);
+  --text-primary: #f0f8ff;
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.2);
+  --accent-color: #b9f2ff;
+  --gold-color: #ffd700;
+  --subtle-color: #a0a0c0;
+  --danger-color: #ff6b6b;
+  --success-color: #4caf50;
+  --shadow-color: rgba(0,0,0,0.2);
+  --hover-bg: rgba(255,255,255,0.1);
+}
+body {
+  margin: 0;
+  padding: 15px;
+  font-family: 'Segoe UI', system-ui, 'Noto Sans Myanmar', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+.header { 
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+  background: var(--card-bg); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--card-border);
+}
+.header h1 { font-size: 20px; color: var(--accent-color); text-shadow: 0 0 4px var(--accent-color); margin: 0; }
+.total { font-size: 18px; font-weight: bold; color: var(--gold-color); text-shadow: 0 0 4px var(--gold-color); }
+.subtitle { font-size: 11px; color: var(--subtle-color); margin-top: 3px; }
+.card {
+  background: var(--card-bg); padding: 12px; border-radius: 10px; margin-bottom: 12px;
+  border: 1px solid var(--card-border); box-shadow: 0 4px 16px var(--shadow-color);
+}
+.card-title { font-size: 14px; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+label { display: block; font-size: 11px; color: var(--subtle-color); margin-bottom: 3px; font-weight: 500; }
+textarea, input, select { 
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--card-border); 
+  background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 12px; box-sizing: border-box; outline: none;
+  font-family: 'Segoe UI', 'Noto Sans Myanmar', monospace;
+}
+textarea:focus, input:focus, select:focus { border: 1px solid var(--accent-color); }
+button { 
+  background: linear-gradient(135deg, var(--accent-color), var(--gold-color)); 
+  border: none; padding: 7px 12px; border-radius: 8px; color: #0b0b1a; font-weight: bold; font-size: 12px; 
+  cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 4px;
+}
+button:hover { transform: scale(1.02); box-shadow: 0 0 6px var(--accent-color); }
+button.ghost { background: transparent; border: 1px solid var(--card-border); color: var(--subtle-color); }
+button.ghost:hover { background: var(--hover-bg); }
+button.small { padding: 5px 10px; font-size: 11px; }
+button.success { background: linear-gradient(135deg, var(--success-color), #81c784); }
+.ledger-grid { 
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; margin-bottom: 12px; 
+  max-height: 250px; overflow-y: auto; padding: 5px; border-radius: 8px; background: rgba(255,255,255,0.05); 
+}
+.grid-item { 
+  background: var(--card-bg); border-radius: 8px; padding: 8px 5px; text-align: center; 
+  border: 1px solid var(--card-border); transition: transform 0.3s; cursor: pointer; position: relative;
+}
+.grid-item:hover { transform: scale(1.03); box-shadow: 0 0 6px var(--accent-color); }
+.grid-item.high-bet { border-color: var(--gold-color); background: rgba(255, 215, 0, 0.1); }
+.grid-number { font-size: 14px; font-weight: bold; margin-bottom: 2px; color: var(--accent-color); font-family: monospace; }
+.grid-amount { font-size: 11px; color: var(--gold-color); }
+.bulk-input-card, .winning-card, .settings-card, .history-card, .twod-card { display: none; }
+.remaining-box { 
+  white-space: pre-wrap; max-height: 120px; overflow: auto; padding: 8px; border-radius: 8px; 
+  background: rgba(255,255,255,0.05); font-family: 'Courier New', monospace; font-size: 11px; 
+  line-height: 1.2; margin-top: 6px; border: 1px solid var(--card-border); 
+}
+.stats { margin-top: 6px; font-size: 11px; color: var(--subtle-color); display: flex; gap: 10px; flex-wrap: wrap; }
+.stats strong { color: var(--gold-color); }
+.stats-item { display: flex; align-items: center; gap: 3px; }
+.tabs {
+  display: flex; gap: 3px; margin-bottom: 10px; border-bottom: 1px solid var(--card-border); 
+  padding-bottom: 6px; flex-wrap: wrap;
+}
+.tab {
+  padding: 5px 10px; background: var(--card-bg); border-radius: 5px; cursor: pointer; color: var(--subtle-color);
+  transition: all 0.2s; font-size: 12px; flex: 1; text-align: center; min-width: 80px;
+}
+.tab.active { background: rgba(185, 242, 255, 0.15); color: var(--accent-color); }
+.tab:hover:not(.active) { background: var(--hover-bg); }
+.action-buttons { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.footer { margin-top: 15px; text-align: center; color: var(--subtle-color); font-size: 11px; padding-top: 10px; border-top: 1px solid var(--card-border); }
+.winning-item { margin-bottom: 3px; padding: 6px 8px; border-radius: 5px; background: var(--card-bg); display: flex; justify-content: space-between; font-size: 11px; }
+.win-amount { color: var(--gold-color); font-weight: bold; }
+.no-winner { color: var(--danger-color); }
+#winning-result { margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 8px; }
+#congrats-message { font-size: 14px; color: var(--gold-color); text-align: center; margin-bottom: 5px; }
+#total-win-amount { font-size: 16px; color: var(--gold-color); font-weight: bold; }
+.shortcut-hint { font-size: 9px; color: var(--subtle-color); margin-top: 2px; font-style: italic; }
+.subtract-btn {
+  position: absolute; top: 2px; right: 4px; background: rgba(0,0,0,0.5); border-radius: 10px; font-size: 8px;
+  padding: 2px 4px; color: #ffaa66; cursor: pointer; opacity: 0.7; transition: 0.2s;
+}
+.subtract-btn:hover { opacity: 1; background: var(--danger-color); color: white; }
+.notification { position: fixed; top: 20px; right: 20px; background: var(--success-color); color: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards; max-width: 300px; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+.twod-content { text-align: center; padding: 20px 15px; }
+.twod-icon { font-size: 48px; color: var(--accent-color); margin-bottom: 15px; text-shadow: 0 0 8px var(--accent-color); }
+.twod-title { font-size: 18px; color: var(--accent-color); margin-bottom: 10px; font-weight: bold; }
+.twod-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-size: 14px; transition: all 0.3s ease; }
+.twod-link:hover { background: var(--hover-bg); transform: translateY(-2px); border-color: var(--accent-color); }
+.twod-link.primary { background: linear-gradient(135deg, var(--accent-color), var(--gold-color)); color: #0b0b1a; border: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1><i class="fas fa-dice"></i>ROME LEDGER V9.0</h1>
+      <div class="subtitle">Myanmar Font + Group DiffPerm + Copy Deducted</div>
+    </div>
+    <div class="total">Total: <span id="total-amount">0</span></div>
+  </div>
+  
+  <div class="tabs">
+    <div class="tab active" data-tab="ledger">Ledgers</div>
+    <div class="tab" data-tab="add-bets">Add Ledger</div>
+    <div class="tab" data-tab="winning">Check Winning</div>
+    <div class="tab" data-tab="history">History</div>
+    <div class="tab" data-tab="settings">⚙️ Limits</div>
+    <div class="tab" data-tab="twod">Switch to 2D</div>
+  </div>
+  
+  <div class="card" id="ledger-card">
+    <div class="card-title"><i class="fas fa-book"></i> Current Ledger <span class="shortcut-hint">here!Best Ledger</span></div>
+    <div id="ledger-grid" class="ledger-grid"></div>
+    <div class="action-buttons">
+      <button id="btn-copy" class="small"><i class="fas fa-copy"></i> Copy Original</button>
+      <button id="btn-copy-deducted" class="small"><i class="fas fa-copy"></i> Copy Deducted & Update</button>
+      <button id="btn-clear" class="small ghost"><i class="fas fa-trash"></i> Clear All</button>
+    </div>
+    <div class="stats">
+      <div class="stats-item"><i class="fas fa-list-ol"></i> Entries: <strong id="stat-count">0</strong></div>
+      <div class="stats-item"><i class="fas fa-coins"></i> Total Amount: <strong id="stat-sum">0</strong></div>
+      <div class="stats-item"><i class="fas fa-chart-bar"></i> Coverage: <strong id="stat-coverage">0%</strong></div>
+      <div class="stats-item"><i class="fas fa-star"></i> Max Bet: <strong id="stat-max">0</strong></div>
+    </div>
+  </div>
+  
+  <div class="card bulk-input-card" id="bulk-card">
+    <div class="card-title"><i class="fas fa-keyboard"></i> </div>
+    <textarea id="bulk-input" rows="6" placeholder="input here"></textarea>
+    <div style="margin-top:10px; display:flex; gap:5px; flex-wrap: wrap;">
+      <button id="btn-submit-bulk"><i class="fas fa-check"></i> Submit Bets</button>
+      <button id="btn-clear-input" class="ghost"><i class="fas fa-eraser"></i> Clear</button>
+      <button id="btn-preview" class="ghost"><i class="fas fa-eye"></i> Preview</button>
+    </div>
+  </div>
+  
+  <div class="card remaining-card">
+    <div class="card-title"><i class="fas fa-list-alt"></i> Remaining Numbers</div>
+    <div style="display:flex; gap:5px; margin-bottom:6px; flex-wrap: wrap;">
+      <button id="btn-show-remaining" class="small"><i class="fas fa-eye"></i> Show</button>
+      <button id="btn-copy-remaining" class="small ghost"><i class="fas fa-copy"></i> Copy</button>
+      <button id="btn-add-remaining" class="small"><i class="fas fa-plus"></i> Add All</button>
+    </div>
+    <div id="remaining-box" class="remaining-box">(Click "Show" to view numbers not in ledger)</div>
+    <div class="stats"><div class="stats-item"><i class="fas fa-hashtag"></i> Remaining: <strong id="remaining-count">1000</strong></div><div class="stats-item"><i class="fas fa-check-circle"></i> Covered: <strong id="covered-count">0</strong></div></div>
+  </div>
+  
+  <div class="card winning-card" id="winning-card">
+    <div class="card-title"><i class="fas fa-trophy"></i> Winning Check</div>
+    <label>Winning Numbers (separate by space or comma)</label>
+    <textarea id="winning-input" rows="2" placeholder="e.g., 123 456 789"></textarea>
+    <div style="margin-top: 8px;"><label>Multiplier</label><select id="winning-multiplier-select"><option value="550">550x</option><option value="800" selected>800x</option><option value="900">900x</option><option value="1500">1500x</option></select></div>
+    <div style="margin-top: 8px; display: flex; gap: 6px;"><button id="btn-check-winning" class="small"><i class="fas fa-calculator"></i> Check Winning</button><button id="btn-clear-winning" class="small ghost"><i class="fas fa-eraser"></i> Clear</button></div>
+    <div id="winning-result" style="display: none;"><div id="congrats-message"></div><div style="font-size:13px; text-align:center;">Total Win: <span id="total-win-amount" style="color:var(--gold-color);">0</span></div><div id="winning-breakdown"></div></div>
+  </div>
+  
+  <div class="card history-card" id="history-card">
+    <div class="card-title"><i class="fas fa-history"></i> Betting History</div>
+    <button id="btn-clear-history" class="small ghost"><i class="fas fa-trash"></i> Clear History</button>
+    <div id="history-list" style="max-height:200px; overflow-y:auto;"></div>
+  </div>
+  
+  <div class="card settings-card" id="settings-card">
+    <div class="card-title"><i class="fas fa-sliders-h"></i> Betting Limits</div>
+    <div class="settings-option"><label><i class="fas fa-ban"></i> Maximum Bet Per Number (MMK)</label><input type="number" id="max-bet-limit" value="50000" step="1000"></div>
+    <button id="btn-save-maxbet" class="small"><i class="fas fa-save"></i> Save Limit</button>
+    <div class="stats-item" style="margin-top:8px;">Current Limit: <strong id="current-limit-display">50,000</strong></div>
+  </div>
+  
+  <div class="card twod-card" id="twod-card">
+    <div class="twod-content"><div class="twod-icon"><i class="fas fa-exchange-alt"></i></div><div class="twod-title">Switch to 2D Mode</div><a href="history.html" class="twod-link primary"><i class="fas fa-external-link-alt"></i> Go to 2D Ledger</a></div>
+  </div>
+  <footer class="footer">need help! telegrm @hein2425</footer>
+</div>
+<div id="notification-container"></div>
+
+<script>
+(() => {
+  // ----- Myanmar to English digits converter -----
+  const MYANMAR_DIGITS = ['၀','၁','၂','၃','၄','၅','၆','၇','၈','၉'];
+  function myanmarToEnglish(str) {
+    if (!str) return str;
+    let result = str;
+    for (let i = 0; i <= 9; i++) {
+      const regex = new RegExp(MYANMAR_DIGITS[i], 'g');
+      result = result.replace(regex, i.toString());
+    }
+    return result;
+  }
+  
+  function normalizeNumberInput(str) {
+    let converted = myanmarToEnglish(str);
+    return converted.replace(/[^0-9]/g, '');
+  }
+  
+  function parseAmountFromString(amtStr) {
+    const clean = myanmarToEnglish(amtStr).replace(/[^0-9]/g, '');
+    if (!clean) return NaN;
+    return parseInt(clean, 10);
+  }
+  
+  const pad3 = n => (''+n).padStart(3,'0');
+  let ledger = new Map();
+  let isRemainingShown = false;
+  let currentAmount = 500;
+  let history = [];
+  let maxBetLimit = 50000;
+  
+  // DOM elements
+  const ledgerGrid = document.getElementById('ledger-grid');
+  const statCount = document.getElementById('stat-count');
+  const statSum = document.getElementById('stat-sum');
+  const totalAmountSpan = document.getElementById('total-amount');
+  const statCoverage = document.getElementById('stat-coverage');
+  const statMax = document.getElementById('stat-max');
+  const remainingBox = document.getElementById('remaining-box');
+  const remainingCount = document.getElementById('remaining-count');
+  const coveredCount = document.getElementById('covered-count');
+  const bulkCard = document.getElementById('bulk-card');
+  const winningCard = document.getElementById('winning-card');
+  const historyCard = document.getElementById('history-card');
+  const ledgerCard = document.getElementById('ledger-card');
+  const twodCard = document.getElementById('twod-card');
+  const settingsCard = document.getElementById('settings-card');
+  const tabs = document.querySelectorAll('.tab');
+  const winningResult = document.getElementById('winning-result');
+  const totalWinAmount = document.getElementById('total-win-amount');
+  const winningBreakdown = document.getElementById('winning-breakdown');
+  const congratsMessage = document.getElementById('congrats-message');
+  
+  function showNotification(msg, type='success') {
+    const container = document.getElementById('notification-container');
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.style.background = type === 'success' ? 'var(--success-color)' : (type === 'warning' ? 'var(--gold-color)' : 'var(--danger-color)');
+    notif.textContent = msg;
+    container.appendChild(notif);
+    setTimeout(() => notif.remove(), 2500);
+  }
+  
+  function saveLedger() { localStorage.setItem('simpleLedger', JSON.stringify(Object.fromEntries(ledger))); }
+  function loadSavedData() {
+    const savedLedger = localStorage.getItem('simpleLedger');
+    if(savedLedger) { try { ledger = new Map(Object.entries(JSON.parse(savedLedger)).map(([k,v]) => [parseInt(k), parseInt(v)])); } catch(e) {} }
+    const savedHistory = localStorage.getItem('ledgerHistory');
+    if(savedHistory) { try { history = JSON.parse(savedHistory); } catch(e) {} }
+    const savedLimit = localStorage.getItem('maxBetLimit');
+    if(savedLimit) maxBetLimit = parseInt(savedLimit);
+    document.getElementById('max-bet-limit').value = maxBetLimit;
+    document.getElementById('current-limit-display').innerText = maxBetLimit.toLocaleString();
+  }
+  
+  function addHistoryEntry(type, details) {
+    history.unshift({type, details, timestamp: Date.now()});
+    if(history.length > 100) history = history.slice(0,100);
+    localStorage.setItem('ledgerHistory', JSON.stringify(history));
+    updateHistoryDisplay();
+  }
+  
+  function updateHistoryDisplay() {
+    const historyListDiv = document.getElementById('history-list');
+    if(history.length === 0) { historyListDiv.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-clock"></i> No history yet</div>'; return; }
+    historyListDiv.innerHTML = '';
+    history.forEach(entry => {
+      const div = document.createElement('div'); div.className = 'history-item';
+      const date = new Date(entry.timestamp);
+      let content = '';
+      if(entry.type === 'bulk_added') content = `Bulk added: ${entry.details.lineCount} lines, total ${entry.details.total.toLocaleString()}`;
+      else if(entry.type === 'bet_removed') content = `Removed: ${entry.details.number} (${entry.details.amount})`;
+      else if(entry.type === 'winning_checked') content = `Won: ${entry.details.winnerCount} winner(s), win ${entry.details.totalWin.toLocaleString()}`;
+      else if(entry.type === 'ledger_cleared') content = `Ledger cleared`;
+      else if(entry.type === 'subtract_remain') content = `Deducted ${entry.details.subtractAmt} from ${entry.details.number}, new ${entry.details.newAmt}`;
+      else if(entry.type === 'ledger_deducted_global') content = `Global deduct ${entry.details.deduction.toLocaleString()}, ${entry.details.removedCount} removed`;
+      else content = JSON.stringify(entry.details);
+      div.innerHTML = `<div><div class="history-numbers">${content}</div><div class="history-date">${date.toLocaleString()}</div></div>`;
+      historyListDiv.appendChild(div);
+    });
+  }
+  
+  function applyMaxBet(originalAmount, numberStr) {
+    if(maxBetLimit > 0 && originalAmount > maxBetLimit) {
+      showNotification(`⚠️ ${numberStr} bet exceeds limit, capped to ${maxBetLimit.toLocaleString()}`, 'warning');
+      return maxBetLimit;
+    }
+    return originalAmount;
+  }
+  
+  function addBetWithLimit(num, addAmount) {
+    const limited = applyMaxBet(addAmount, pad3(num));
+    if(limited <= 0) return false;
+    const existing = ledger.get(num) || 0;
+    ledger.set(num, existing + limited);
+    return true;
+  }
+  
+  async function handleSubtractAndCopy(num, currentAmt) {
+    let subtractVal = prompt(`💰 Current ${pad3(num)}: ${currentAmt.toLocaleString()}\nDeduct amount (remainder copied):`, "0");
+    if(subtractVal === null) return;
+    let deduct = parseInt(subtractVal);
+    if(isNaN(deduct) || deduct <= 0) { showNotification("Valid positive amount", "warning"); return; }
+    if(deduct >= currentAmt) {
+      if(confirm(`Remove ${pad3(num)} entirely?`)) { ledger.delete(num); addHistoryEntry('bet_removed', { number: pad3(num), amount: currentAmt }); updateLedger(); showNotification(`Removed ${pad3(num)}`, "warning"); }
+      return;
+    }
+    const newAmount = currentAmt - deduct;
+    ledger.set(num, newAmount);
+    updateLedger();
+    await navigator.clipboard.writeText(`${pad3(num)} ${newAmount}`);
+    showNotification(`✅ Deducted ${deduct.toLocaleString()}, remaining ${newAmount.toLocaleString()} copied`, "success");
+    addHistoryEntry('subtract_remain', { number: pad3(num), subtractAmt: deduct, newAmt: newAmount });
+  }
+  
+  
+function updateLedger() {
+    ledgerGrid.innerHTML = '';
+    let total = 0, maxBetVal = 0;
+    const sorted = [...ledger].sort((a,b) => b[1] - a[1]);
+    sorted.forEach(([num, amt]) => { total += amt; maxBetVal = Math.max(maxBetVal, amt); });
+    for(const [num, amt] of sorted) {
+      const div = document.createElement('div');
+      div.className = `grid-item ${amt >= 1000 ? 'high-bet' : ''}`;
+      div.innerHTML = `<div class="grid-number">${pad3(num)}</div><div class="grid-amount">${amt.toLocaleString()}</div><div class="subtract-btn" title="Deduct & copy">-</div>`;
+      div.querySelector('.grid-number').addEventListener('click', (e) => { e.stopPropagation(); if(confirm(`Remove ${pad3(num)}?`)) { addHistoryEntry('bet_removed', { number: pad3(num), amount: amt }); ledger.delete(num); updateLedger(); showNotification(`Removed ${pad3(num)}`, 'warning'); } });
+      div.querySelector('.subtract-btn').addEventListener('click', (e) => { e.stopPropagation(); handleSubtractAndCopy(num, amt); });
+      ledgerGrid.appendChild(div);
+    }
+    const count = ledger.size;
+    statCount.textContent = count;
+    statSum.textContent = total.toLocaleString();
+    totalAmountSpan.textContent = total.toLocaleString();
+    coveredCount.textContent = count;
+    remainingCount.textContent = 1000 - count;
+    statCoverage.textContent = `${(count / 10).toFixed(1)}%`;
+    statMax.textContent = maxBetVal.toLocaleString();
+    saveLedger();
+    if(isRemainingShown) showRemainingNumbers();
+  }
+  
+  // Permutation
+  function permute3(numStr) {
+    const arr = numStr.split('');
+    const result = new Set();
+    function permute(current, remaining) {
+      if(current.length === 3) { result.add(current.join('')); return; }
+      for(let i=0; i<remaining.length; i++) permute([...current, remaining[i]], [...remaining.slice(0,i), ...remaining.slice(i+1)]);
+    }
+    permute([], arr);
+    return [...result].map(s => parseInt(s,10));
+  }
+  
+  function splitNumbers(input) {
+    const cleaned = myanmarToEnglish(input);
+    return cleaned.split(/[\s\/\*\.,-]+/).map(n => n.trim()).filter(n => /^\d{1,3}$/.test(n)).map(n => parseInt(n)).filter(n => n >= 0 && n <= 999);
+  }
+  
+  // ========== NEW: Group Differential Permutation (423=1000R500) ==========
+  function processGroupDifferentialPermutation(line) {
+    const match = line.match(/^(\d{3,})=(\d+)R(\d+)$/i);
+    if(!match) return null;
+    const baseNumStr = match[1];
+    if(baseNumStr.length !== 3) return null;
+    const baseNum = parseInt(baseNumStr, 10);
+    const baseAmount = parseInt(match[2], 10);
+    const permAmount = parseInt(match[3], 10);
+    if(isNaN(baseAmount) || isNaN(permAmount)) return null;
+    const allPerms = permute3(pad3(baseNum));
+    const bets = allPerms.map(p => ({ num: p, amt: p === baseNum ? baseAmount : permAmount }));
+    return { type: 'diffPerm', bets };
+  }
+  
+  // existing pattern functions (simplified but keep core)
+  function processDirectAndR(line) {
+    const eqMatch = line.match(/^([\d\s\/\*\.,-]+)=(\d+)$/);
+    if(eqMatch) {
+      const numbers = splitNumbers(eqMatch[1]);
+      const amount = parseInt(eqMatch[2]);
+      if(numbers.length) return { type: 'eq', numbers, amount };
+    }
+    const rMatch = line.match(/^([\d\s\/\*\.,-]+)r(\d+)$/i);
+    if(rMatch) {
+      const baseNums = splitNumbers(rMatch[1]);
+      const amount = parseInt(rMatch[2]);
+      let all = [];
+      baseNums.forEach(n => { all.push(...permute3(pad3(n))); });
+      return { type: 'r', numbers: [...new Set(all)], amount };
+    }
+    return null;
+  }
+  
+  function processKhweBasic(line) {
+    const m = line.match(/^([0-9]*)ခွေ(\d+)$/);
+    if(!m) return null;
+    let digits = m[1] === '' ? ['0','1','2','3','4','5','6','7','8','9'] : m[1].split('');
+    const amount = parseInt(m[2]);
+    return { digits: [...new Set(digits)], amount };
+  }
+  
+  function processApue(line) {
+    const m = line.match(/^([0-9]*)အပူး(\d+)$/);
+    if(!m) return null;
+    let digits = m[1] === '' ? ['0','1','2','3','4','5','6','7','8','9'] : [...new Set(m[1].split(''))];
+    const amount = parseInt(m[2]);
+    return { digits, amount };
+  }
+  
+  function processTeitLelPeit(line, pattern) {
+    const regex = pattern === 'teit' ? /^([0-9]+)ထိပ်(\d+)$/ : (pattern === 'lel' ? /^([0-9]+)လယ်(\d+)$/ : /^([0-9]+)ပိတ်(\d+)$/);
+    const m = line.match(regex);
+    if(!m) return null;
+    const digits = [...new Set(m[1].split(''))];
+    const amount = parseInt(m[2]);
+    return { digits, amount, pos: pattern };
+  }
+  
+  // bulk processor with Myanmar + group differential
+  function processBulkInput(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    let totalAddedAmount = 0, numbersAdded = 0, lineCount = 0;
+    
+    lines.forEach(rawLine => {
+      const line = myanmarToEnglish(rawLine); // full conversion
+      // 1) Group Differential Permutation (423=1000R500) 
+      const groupDiff = processGroupDifferentialPermutation(line);
+      if(groupDiff) {
+        groupDiff.bets.forEach(bet => { if(addBetWithLimit(bet.num, bet.amt)) { totalAddedAmount += bet.amt; numbersAdded++; } });
+        lineCount++; return;
+      }
+      // 2) Direct = or R method
+      const dr = processDirectAndR(line);
+      if(dr) {
+        dr.numbers.forEach(num => { if(addBetWithLimit(num, dr.amount)) { totalAddedAmount += dr.amount; numbersAdded++; } });
+        lineCount++; return;
+      }
+      // 3) Khwe
+      const khwe = processKhweBasic(line);
+      if(khwe && khwe.digits.length >= 3) {
+        const digs = khwe.digits;
+        for(let i=0;i<digs.length;i++) for(let j=0;j<digs.length;j++) if(j!==i) for(let k=0;k<digs.length;k++) if(k!==i && k!==j) {
+          const num = parseInt(digs[i]+digs[j]+digs[k],10);
+          if(addBetWithLimit(num, khwe.amount)) { totalAddedAmount += khwe.amount; numbersAdded++; }
+        }
+        lineCount++; return;
+      }
+      // 4) Apue
+      const apue = processApue(line);
+      if(apue) {
+        for(let x=0;x<=9;x++) for(let y=0;y<=9;y++) if(x!==y) {
+          const num1 = parseInt(`${x}${x}${y}`), num2 = parseInt(`${x}${y}${y}`);
+          if(apue.digits.includes(x.toString()) || apue.digits.includes(y.toString())) {
+            if(addBetWithLimit(num1, apue.amount)) { totalAddedAmount += apue.amount; numbersAdded++; }
+            if(addBetWithLimit(num2, apue.amount)) { totalAddedAmount += apue.amount; numbersAdded++; }
+          }
+        }
+        lineCount++; return;
+      }
+      // 5) Teit / Lel / Peit
+      const teit = processTeitLelPeit(line, 'teit');
+      if(teit) {
+        teit.digits.forEach(d => { for(let j=0;j<=9;j++) for(let k=0;k<=9;k++) if(addBetWithLimit(parseInt(`${d}${j}${k}`), teit.amount)) { totalAddedAmount += teit.amount; numbersAdded++; } });
+        lineCount++; return;
+      }
+      const lel = processTeitLelPeit(line, 'lel');
+      if(lel) {
+        lel.digits.forEach(d => { for(let i=0;i<=9;i++) for(let k=0;k<=9;k++) if(addBetWithLimit(parseInt(`${i}${d}${k}`), lel.amount)) { totalAddedAmount += lel.amount; numbersAdded++; } });
+        lineCount++; return;
+      }
+      const peit = processTeitLelPeit(line, 'peit');
+      if(peit) {
+        peit.digits.forEach(d => { for(let i=0;i<=9;i++) for(let j=0;j<=9;j++) if(addBetWithLimit(parseInt(`${i}${j}${d}`), peit.amount)) { totalAddedAmount += peit.amount; numbersAdded++; } });
+        lineCount++; return;
+      }
+      // 6) fallback numbers + amount at end
+      const parts = line.split(/\s+/);
+      if(parts.length >= 2 && !isNaN(parseInt(parts[parts.length-1]))) {
+        const amount = parseInt(parts.pop());
+        const nums = splitNumbers(parts.join(' '));
+        nums.forEach(n => { if(addBetWithLimit(n, amount)) { totalAddedAmount += amount; numbersAdded++; } });
+        lineCount++; return;
+      }
+      const nums = splitNumbers(line);
+      if(nums.length) {
+        const amount = currentAmount;
+        nums.forEach(n => { if(addBetWithLimit(n, amount)) { totalAddedAmount += amount; numbersAdded++; } });
+        lineCount++;
+      } else { showNotification(`Cannot parse: ${rawLine.substring(0,40)}`, 'warning'); }
+    });
+    
+    updateLedger();
+    if(numbersAdded > 0) addHistoryEntry('bulk_added', { lineCount, numbersCount: numbersAdded, total: totalAddedAmount });
+    showNotification(`✅ ${lineCount} lines | ${numbersAdded} bets | Total: ${totalAddedAmount.toLocaleString()}`, 'success');
+    document.getElementById('bulk-input').value = '';
+  }
+  
+  function computeRemaining() { let rem=[]; for(let i=0;i<1000;i++) if(!ledger.has(i)) rem.push(pad3(i)); return rem; }
+  function showRemainingNumbers() {
+    const rem = computeRemaining();
+    let out=[]; for(let i=0;i<rem.length;i+=6) out.push(rem.slice(i,i+6).join('  '));
+    remainingBox.textContent = out.join('\n');
+    isRemainingShown=true; document.getElementById('btn-show-remaining').innerHTML='<i class="fas fa-eye-slash"></i> Hide';
+  }
+   
+  // Event listeners
+  document.getElementById('btn-submit-bulk').addEventListener('click', () => { const txt = document.getElementById('bulk-input').value.trim(); if(txt) processBulkInput(txt); else showNotification('Enter bets', 'warning'); });
+  document.getElementById('btn-clear-input').addEventListener('click', () => { if(confirm('Clear input?')) document.getElementById('bulk-input').value = ''; });
+  document.getElementById('btn-preview').addEventListener('click', () => { const lines = document.getElementById('bulk-input').value.split('\n').filter(l=>l.trim()); alert(`Preview: ${lines.length} lines`); });
+  document.getElementById('btn-show-remaining').addEventListener('click', () => { if(!isRemainingShown) showRemainingNumbers(); else { remainingBox.textContent='(Click Show)'; isRemainingShown=false; document.getElementById('btn-show-remaining').innerHTML='<i class="fas fa-eye"></i> Show'; } });
+  document.getElementById('btn-copy-remaining').addEventListener('click', async () => { if(remainingBox.textContent.includes('Click Show')) showNotification('Show remaining first','warning'); else await navigator.clipboard.writeText(remainingBox.textContent); showNotification('Copied'); });
+  document.getElementById('btn-add-remaining').addEventListener('click', () => { const rem=computeRemaining(); if(!rem.length) return; if(confirm(`Add all ${rem.length} numbers with ${currentAmount} each?`)) { rem.forEach(n=>{let num=parseInt(n); ledger.set(num,(ledger.get(num)||0)+currentAmount);}); updateLedger(); addHistoryEntry('remaining_added',{count:rem.length,total:rem.length*currentAmount}); showNotification(`Added ${rem.length} numbers`); } });
+  document.getElementById('btn-copy').addEventListener('click', async () => { if(ledger.size) await navigator.clipboard.writeText([...ledger].map(([n,a])=>`${pad3(n)} ${a}`).join('\n')); showNotification('Original copied'); });
+  document.getElementById('btn-copy-deducted').addEventListener('click', async () => { if(!ledger.size) return; let d=prompt('Deduct amount from ALL bets:', '0'); if(d===null) return; let deduct=parseInt(d); if(isNaN(deduct)||deduct<0) return; if(confirm(`Permanently deduct ${deduct.toLocaleString()} from all?`)) { let newMap=new Map(), removed=0; for(let [num,amt] of ledger){ let newAmt=amt-deduct; if(newAmt>0) newMap.set(num,newAmt); else removed++; } ledger=newMap; updateLedger(); await navigator.clipboard.writeText([...ledger].map(([n,a])=>`${pad3(n)} ${a}`).join('\n')); showNotification(`Deducted ${deduct.toLocaleString()}, ${removed} removed`); addHistoryEntry('ledger_deducted_global',{deduction:deduct,removedCount:removed}); } });
+  document.getElementById('btn-clear').addEventListener('click', () => { if(confirm('Clear all?')){ ledger.clear(); updateLedger(); addHistoryEntry('ledger_cleared',{}); showNotification('Cleared','warning'); } });
+  document.getElementById('btn-check-winning').addEventListener('click', () => { const txt=winningInput.value.trim(); if(!txt) return; let numbers=txt.split(/[,\s]+/).map(n=>myanmarToEnglish(n)).filter(n=>/^\d{1,3}$/.test(n)).map(n=>{let num=parseInt(n); return num<10?num*100:(num<100?num*10:num);}); if(!numbers.length) return; const mult=parseInt(winningMultiplierSelect.value); let total=0, breakdown=[], winners=0; numbers.forEach(num=>{ let amt=ledger.get(num)||0; if(amt>0){ let win=amt*mult; total+=win; breakdown.push(`<div class="winning-item"><span>${pad3(num)}</span><span>${amt}×${mult}=<span class="win-amount">${win.toLocaleString()}</span></span></div>`); winners++; } else breakdown.push(`<div class="winning-item no-winner"><span>${pad3(num)}</span><span>No bet</span></div>`); }); totalWinAmount.textContent=total.toLocaleString(); winningBreakdown.innerHTML=breakdown.join(''); congratsMessage.innerHTML=winners?`🎉 ${winners} winning number(s)! 🎉`:`<span style="color:var(--danger-color);">No wins</span>`; winningResult.style.display='block'; if(winners) addHistoryEntry('winning_checked',{winnerCount:winners,totalWin:total,multiplier:mult}); });
+  document.getElementById('btn-clear-winning').addEventListener('click',()=>{winningInput.value=''; winningResult.style.display='none';});
+  document.getElementById('btn-clear-history').addEventListener('click',()=>{if(confirm('Clear history?')){history=[];localStorage.removeItem('ledgerHistory');updateHistoryDisplay();showNotification('History cleared');}});
+  document.getElementById('btn-save-maxbet').addEventListener('click',()=>{let newLimit=parseInt(document.getElementById('max-bet-limit').value); if(isNaN(newLimit)) newLimit=0; maxBetLimit=newLimit; localStorage.setItem('maxBetLimit',maxBetLimit); document.getElementById('current-limit-display').innerText=maxBetLimit.toLocaleString(); showNotification(`Limit set`);});
+  tabs.forEach(tab=>{tab.addEventListener('click',()=>{if(tab.dataset.tab==='twod'){window.location.href='history.html';return;} tabs.forEach(t=>t.classList.remove('active')); tab.classList.add('active'); ledgerCard.style.display=bulkCard.style.display=winningCard.style.display=historyCard.style.display=twodCard.style.display=settingsCard.style.display='none'; if(tab.dataset.tab==='ledger') ledgerCard.style.display='block'; else if(tab.dataset.tab==='add-bets') bulkCard.style.display='block'; else if(tab.dataset.tab==='winning') winningCard.style.display='block'; else if(tab.dataset.tab==='history'){historyCard.style.display='block';updateHistoryDisplay();} else if(tab.dataset.tab==='settings') settingsCard.style.display='block'; if(tab.dataset.tab!=='winning') winningResult.style.display='none';});});
+  loadSavedData(); updateLedger(); updateHistoryDisplay();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ROME LEDGER V12 | Direct+Perm Group (Exclude Original)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ========== DARK THEME ========== */
+:root {
+  --bg-primary: radial-gradient(circle at top left, #1c1c2e, #0b0b1a);
+  --text-primary: #f0f8ff;
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.2);
+  --accent-color: #b9f2ff;
+  --gold-color: #ffd700;
+  --subtle-color: #a0a0c0;
+  --danger-color: #ff6b6b;
+  --success-color: #4caf50;
+  --warning-color: #ffa726;
+  --shadow-color: rgba(0,0,0,0.2);
+  --hover-bg: rgba(255,255,255,0.1);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 15px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+.header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 15px;
+  background: var(--card-bg);
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.header h1 { 
+  font-size: 20px; 
+  color: var(--accent-color); 
+  text-shadow: 0 0 4px var(--accent-color);
+  margin: 0;
+}
+.total { 
+  font-size: 18px; 
+  font-weight: bold; 
+  color: var(--gold-color); 
+  text-shadow: 0 0 4px var(--gold-color);
+}
+.subtitle { font-size: 11px; color: var(--subtle-color); margin-top: 3px; }
+.card {
+  background: var(--card-bg);
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 16px var(--shadow-color);
+}
+.card-title { font-size: 14px; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+label { display: block; font-size: 11px; color: var(--subtle-color); margin-bottom: 3px; font-weight: 500; }
+textarea, input, select { 
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--card-border); 
+  background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 12px; outline: none;
+}
+textarea:focus, input:focus, select:focus { border: 1px solid var(--accent-color); }
+button { 
+  background: linear-gradient(135deg, var(--accent-color), var(--gold-color)); 
+  border: none; padding: 7px 12px; border-radius: 8px; color: #0b0b1a; font-weight: bold; font-size: 12px; 
+  cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;
+}
+button:hover { transform: scale(1.02); box-shadow: 0 0 6px var(--accent-color); }
+button.ghost { background: transparent; border: 1px solid var(--card-border); color: var(--subtle-color); }
+button.ghost:hover { background: var(--hover-bg); }
+button.small { padding: 5px 10px; font-size: 11px; }
+button.danger { background: linear-gradient(135deg, #ff6b6b, #c44545); color: white; }
+.ledger-grid { 
+  display: grid; 
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px; 
+  margin-bottom: 12px; 
+  max-height: 260px; 
+  overflow-y: auto; 
+  padding: 5px; 
+  border-radius: 8px; 
+  background: rgba(255,255,255,0.03);
+}
+.grid-item { 
+  background: var(--card-bg); 
+  border-radius: 8px; 
+  padding: 8px 5px; 
+  text-align: center; 
+  border: 1px solid var(--card-border); 
+  transition: transform 0.2s; 
+  cursor: pointer; 
+  position: relative;
+}
+.grid-item:hover { transform: scale(1.02); box-shadow: 0 0 6px var(--accent-color); }
+.grid-number { font-size: 14px; font-weight: bold; margin-bottom: 2px; color: var(--accent-color); }
+.grid-amount { font-size: 11px; color: var(--gold-color); }
+.subtract-btn {
+  position: absolute; top: 2px; right: 4px; background: rgba(0,0,0,0.6); border-radius: 10px; font-size: 8px;
+  padding: 2px 5px; color: #ffaa66; cursor: pointer; opacity: 0.7;
+}
+.subtract-btn:hover { opacity: 1; background: var(--danger-color); color: white; }
+.remaining-box { 
+  white-space: pre-wrap; max-height: 120px; overflow: auto; padding: 8px; border-radius: 8px; 
+  background: rgba(255,255,255,0.05); font-family: monospace; font-size: 11px; 
+  margin-top: 6px; border: 1px solid var(--card-border); 
+}
+.stats { margin-top: 6px; font-size: 11px; color: var(--subtle-color); display: flex; gap: 12px; flex-wrap: wrap; }
+.stats strong { color: var(--gold-color); }
+.tabs {
+  display: flex; gap: 3px; margin-bottom: 10px; border-bottom: 1px solid var(--card-border); 
+  padding-bottom: 6px; flex-wrap: wrap;
+}
+.tab {
+  padding: 5px 10px; background: var(--card-bg); border-radius: 5px; cursor: pointer; color: var(--subtle-color);
+  font-size: 12px; flex: 1; text-align: center; min-width: 70px;
+}
+.tab.active { background: rgba(185, 242, 255, 0.15); color: var(--accent-color); }
+.tab:hover:not(.active) { background: var(--hover-bg); }
+.action-buttons { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+.footer { margin-top: 15px; text-align: center; color: var(--subtle-color); font-size: 10px; padding-top: 10px; border-top: 1px solid var(--card-border); }
+.excess-panel {
+  background: rgba(255, 107, 107, 0.12);
+  border-left: 4px solid var(--danger-color);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 12px;
+}
+.excess-title { font-size: 12px; font-weight: bold; color: #ff8a8a; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.excess-list { font-size: 11px; font-family: monospace; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 6px; max-height: 130px; overflow: auto; }
+.excess-row { display: flex; justify-content: space-between; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.notification { position: fixed; top: 20px; right: 20px; background: var(--success-color); color: #0b0b1a; padding: 10px 15px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards; max-width: 300px; font-weight: bold; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; } }
+.person-selector { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; }
+.person-badge { background: var(--accent-color); color: #0b0b1a; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+.person-badge.active { background: var(--gold-color); box-shadow: 0 0 8px gold; }
+.person-badge:hover { opacity: 0.8; }
+.person-list { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.person-mgt { display: flex; gap: 5px; margin-left: auto; }
+#bulk-card, #winning-card, #history-card, #settings-card, #twod-card, #person-card, #block-card { display: none; }
+#ledger-card { display: block; }
+.block-tag { background: rgba(255,100,100,0.2); border-radius: 12px; padding: 2px 6px; font-size: 10px; color: #ffaaaa; margin-left: 6px; }
+.block-list-container { max-height: 180px; overflow-y: auto; margin-top: 8px; }
+.block-item { background: rgba(255,255,255,0.05); margin: 4px 0; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+.block-number { font-family: monospace; font-weight: bold; color: #ffaa88; }
+.bulk-info { font-size: 11px; margin-top: 6px; color: var(--subtle-color); }
+.example-format { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 5px; font-family: monospace; font-size: 10px; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div><h1><i class="fas fa-users"></i> ROME 3D LEDGER </h1><div class="subtitle">Upgrade your earn money</div></div>
+    <div class="total" id="global-total-display">Total: <span id="total-amount">0</span></div>
+  </div>
+  
+  <div class="tabs">
+    <div class="tab active" data-tab="ledger">📒 Ledger</div>
+    <div class="tab" data-tab="add-bets">➕ Add Bets</div>
+    <div class="tab" data-tab="person">👥 Persons</div>
+    <div class="tab" data-tab="winning">🏆 Winning</div>
+    <div class="tab" data-tab="history">📜 History</div>
+    <div class="tab" data-tab="settings">⚙️ Limits</div>
+    <div class="tab" data-tab="block">🚫 Block</div>
+    <div class="tab" data-tab="twod">2D Mode</div>
+  </div>
+  
+  <!-- Person Management Card -->
+  <div class="card" id="person-card">
+    <div class="card-title"><i class="fas fa-user-friends"></i> Manage Persons</div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+      <input type="text" id="new-person-name" placeholder="Person name" style="flex:1;">
+      <button id="btn-add-person"><i class="fas fa-plus"></i> Add Person</button>
+    </div>
+    <div id="persons-list-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+    <div class="stats" style="margin-top: 10px;"><i class="fas fa-info-circle"></i> Each person has own ledger. Block list is shared globally.</div>
+  </div>
+  
+  <!-- Ledger Card -->
+  <div class="card" id="ledger-card">
+    <div class="person-selector" id="ledger-person-selector">
+      <span><i class="fas fa-user"></i> Current Person:</span>
+      <div id="ledger-person-buttons" class="person-list"></div>
+      <div class="person-mgt">
+        <button id="open-person-mgt" class="small ghost"><i class="fas fa-cog"></i> Manage</button>
+      </div>
+    </div>
+    <div class="card-title"><i class="fas fa-book"></i> Main Ledger (Capped Amounts Only) - <span id="current-person-name">Default</span></div>
+    <div id="ledger-grid" class="ledger-grid"></div>
+    <div class="action-buttons">
+      <button id="btn-copy" class="small"><i class="fas fa-copy"></i> Copy Ledger</button>
+      <button id="btn-copy-deducted" class="small"><i class="fas fa-copy"></i> Copy Deducted</button>
+      <button id="btn-clear" class="small ghost"><i class="fas fa-trash"></i> Clear All</button>
+    </div>
+    <div class="stats">
+      <div class="stats-item">Entries: <strong id="stat-count">0</strong></div>
+      <div class="stats-item">Ledger Total: <strong id="stat-sum">0</strong></div>
+      <div class="stats-item">Coverage: <strong id="stat-coverage">0%</strong></div>
+      <div class="stats-item">Max Bet: <strong id="stat-max">0</strong></div>
+    </div>
+    <div id="excess-separate-area"></div>
+  </div>
+  
+  <!-- ADD BETS CARD (Bulk Input) -->
+  <div class="card" id="bulk-card">
+    <div class="card-title"><i class="fas fa-dice-d6"></i> Bulk Input (All Bet Types)</div>
+    <textarea id="bulk-input" rows="5" placeholder="Examples:
+123 456 789=1000R500
+125=1000R500
+123ခွေ500
+ခွ1000
+12ခွေပူးခွtri200
+56ထိပ်300
+110 to 119 r100
+24ပတ်500
+126 806 893=5000
+153 500"></textarea>
+    <div class="example-format">✨ Direct+Perm Group: [num list]=[directAmount]R[permAmount] → direct on original, permAmount on each permutation (excluding original)<br>
+    ✨ ပတ် (PAT): [digits]ပတ်[amount] → all 3-digit numbers containing at least one given digit</div>
+    <div style="display: flex; gap: 6px; margin: 8px 0;">
+      <button id="btn-submit-bulk"><i class="fas fa-check"></i> Submit Bulk Bets</button>
+      <button id="btn-preview-bulk" class="ghost"><i class="fas fa-eye"></i> Preview Lines</button>
+      <button id="btn-clear-bulk" class="ghost"><i class="fas fa-eraser"></i> Clear</button>
+    </div>
+    <div class="stats"><i class="fas fa-info-circle"></i> Supports: ခွေ,ခွ,ထိပ်,လယ်,ပိတ်,အပူး, range, direct group, Direct+Perm group, and new ပတ် (pat).</div>
+    <div id="quick-block-info" style="margin-top: 8px; font-size: 11px; color: #ffaa88;"></div>
+    <hr style="border-color:rgba(255,255,255,0.1); margin: 10px 0;">
+    <div class="card-title"><i class="fas fa-plus-square"></i> Single Add (Block-checked)</div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div style="flex:2;"><label>🔢 Number (000-999)</label><input type="number" id="manual-number" min="0" max="999" placeholder="e.g., 153"></div>
+      <div style="flex:2;"><label>💰 Amount</label><input type="number" id="manual-amount" min="1" placeholder="Amount"></div>
+      <div style="flex:1; display: flex; align-items: end;"><button id="btn-add-bet" style="width:100%"><i class="fas fa-plus-circle"></i> Add Bet</button></div>
+    </div>
+  </div>
+  
+  <!-- Remaining Numbers Card -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-list-alt"></i> Remaining Numbers (Current Person)</div>
+    <div style="display:flex; gap:5px; margin-bottom:6px;">
+      <button id="btn-show-remaining" class="small"><i class="fas fa-eye"></i> Show</button>
+      <button id="btn-copy-remaining" class="small ghost">Copy</button>
+      <button id="btn-add-remaining" class="small">Add All</button>
+    </div>
+    <div id="remaining-box" class="remaining-box">(Click Show)</div>
+  </div>
+  
+  <!-- Winning Card (exact match only) -->
+  <div class="card" id="winning-card">
+    <div class="card-title"><i class="fas fa-trophy"></i> Winning Check (Exact Match)</div>
+    <textarea id="winning-input" rows="2" placeholder="e.g., 153 456 789 (only exact same number wins)"></textarea>
+    <select id="winning-multiplier-select" style="margin:6px 0;"><option value="800" selected>800x</option><option value="550">550x</option><option value="900">900x</option></select>
+    <div style="display:flex; gap:5px;">
+      <button id="btn-check-winning">Check</button>
+      <button id="btn-clear-winning" class="ghost">Clear</button>
+    </div>
+    <div id="winning-result" style="display:none; margin-top:10px;"></div>
+  </div>
+  
+  <!-- History Card -->
+  <div class="card" id="history-card">
+    <div class="card-title"><i class="fas fa-history"></i> History (Global) <button id="btn-clear-history" class="small ghost" style="margin-left:auto;">Clear</button></div>
+    <div id="history-list" style="max-height:200px; overflow:auto; font-size:11px;"></div>
+  </div>
+  
+  <!-- Settings Card -->
+  <div class="card" id="settings-card">
+    <div class="card-title"><i class="fas fa-sliders-h"></i> Limit Settings (Global)</div>
+    <label>Max Bet Per Number (Capped Amount)</label>
+    <input type="number" id="max-bet-limit" value="50000">
+    <button id="btn-save-maxbet" class="small">Save</button>
+    <div class="stats"><i class="fas fa-info-circle"></i> Numbers exceeding limit → capped amount stays in ledger, excess goes to separate red zone.</div>
+  </div>
+  
+  <!-- BLOCK NUMBERS CARD -->
+  <div class="card" id="block-card">
+    <div class="card-title"><i class="fas fa-ban"></i> Block Numbers Management (Global)</div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+      <input type="number" id="block-number-input" min="0" max="999" placeholder="Number to block" style="flex:2;">
+      <button id="btn-add-block"><i class="fas fa-plus-circle"></i> Block Number</button>
+      <button id="btn-copy-blocks" class="ghost"><i class="fas fa-copy"></i> Copy Block List</button>
+    </div>
+    <div><strong>Blocked Numbers:</strong> <span id="block-count-badge">0</span></div>
+    <div id="block-list-container" class="block-list-container"></div>
+  </div>
+  
+  <!-- 2D Mode Card -->
+  <div class="card" id="twod-card">
+    <div class="twod-content" style="text-align:center;"><i class="fas fa-exchange-alt" style="font-size:40px;"></i><div><a href="#" style="color:var(--gold-color);">2D ledger placeholder</a></div></div>
+  </div>
+  
+  <footer class="footer">contact me at Telegram@hein2425</footer>
+</div>
+<div id="notification-container"></div>
+
+<script>
+(function(){
+  // ---------- UTILITIES ----------
+  const pad3 = n => String(n).padStart(3,'0');
+  function splitNumbers(input) {
+    return input.split(/[\s\/\*\.,-]+/).map(n=>n.trim()).filter(n=>/^\d{1,3}$/.test(n)).map(n=>parseInt(n,10)).filter(n=>n>=0&&n<=999);
+  }
+  function permute3(numStr){
+    let arr = numStr.split('');
+    let result = new Set();
+    function permute(current, remaining){
+      if(current.length===3){ result.add(current.join('')); return; }
+      for(let i=0;i<remaining.length;i++){
+        let next = [...current, remaining[i]];
+        let newRemaining = [...remaining.slice(0,i), ...remaining.slice(i+1)];
+        permute(next, newRemaining);
+      }
+    }
+    permute([], arr);
+    return [...result].map(s=>parseInt(s,10));
+  }
+  
+  // ----- NEW: ပတ် (PAT) - any 3-digit number containing at least one given digit -----
+  function processPat(line){
+    let match = line.match(/^([0-9]+)ပတ်(\d+)$/);
+    if(!match) return null;
+    let digitsStr = match[1];
+    let amount = parseInt(match[2]);
+    let digits = [...new Set(digitsStr.split(''))]; // unique digits
+    if(digits.length === 0) return null;
+    let numbers = [];
+    for(let i=0;i<=9;i++){
+      for(let j=0;j<=9;j++){
+        for(let k=0;k<=9;k++){
+          let s = `${i}${j}${k}`;
+          if(digits.some(d => s.includes(d))){
+            numbers.push(parseInt(s,10));
+          }
+        }
+      }
+    }
+    // Remove duplicates just in case (should be unique)
+    let uniqueNumbers = [...new Set(numbers)];
+    return { type: 'pat', numbers: uniqueNumbers, amount };
+  }
+  
+  // ------ Direct+Permutation Group (Exclude Original) ------
+  function processDirectPermGroup(line){
+    let match = line.match(/^([\d\s\/\*\.,-]+)=(\d+)R(\d+)$/i);
+    if(!match) return null;
+    let numbersStr = match[1];
+    let directAmount = parseInt(match[2]);
+    let permAmount = parseInt(match[3]);
+    let numbers = splitNumbers(numbersStr);
+    if(numbers.length===0) return null;
+    return { type: 'directPermGroup', numbers, directAmount, permAmount };
+  }
+  
+// Existing parsers (khwe, teit, range, etc.)
+  function processRange(line){
+    let match = line.match(/^(\d{3})\s+to\s+(\d{3})\s*([=r])(\d+)$/i);
+    if(!match) return null;
+    let start=parseInt(match[1]), end=parseInt(match[2]), method=match[3].toLowerCase(), amount=parseInt(match[4]);
+    if(start>end || start<0 || end>999) return null;
+    return {start,end,method,amount, type:'range'};
+  }
+  function processKhwe(line){
+    let match = line.match(/^([0-9]*)ခွေ(\d+)$/);
+    if(!match) return null;
+    let digitsStr = match[1];
+    let amount = parseInt(match[2]);
+    let digits;
+    if(digitsStr==='') digits = ['0','1','2','3','4','5','6','7','8','9'];
+    else if(digitsStr.length<3) { notify('At least 3 digits required for Khwe','warning'); return null; }
+    else digits = digitsStr.split('');
+    return {digits, amount, type:'khwe'};
+  }
+  function processKhwePattern(line){
+    let match = line.match(/^ခွ\s*(\d+)$/);
+    if(!match) return null;
+    let amount = parseInt(match[1]);
+    let numbers=[];
+    for(let x=0;x<=9;x++) for(let y=0;y<=9;y++) if(x!==y) { numbers.push(x*100+y*10+x); numbers.push(y*100+x*10+y); }
+    numbers = [...new Set(numbers)];
+    return {type:'khwe-pattern', numbers, amount};
+  }
+  function processKhwePuKhweTri(line){
+    let match = line.match(/^([0-9]+)ခွေပူးခွtri(\d+)$/);
+    if(!match) return null;
+    let digitsStr = match[1];
+    let amount = parseInt(match[2]);
+    let digits = [...new Set(digitsStr.split(''))];
+    if(digits.length===0) { notify('At least 1 digit required for Khwe Pu Khwe Tri','warning'); return null; }
+    return {digits, amount, type:'khwe-pu-khwe-tri'};
+  }
+  function processApue(line){
+    let match = line.match(/^([0-9]*)အပူး(\d+)$/);
+    if(!match) return null;
+    let digitsStr=match[1];
+    let amount=parseInt(match[2]);
+    let digits = digitsStr==='' ? ['0','1','2','3','4','5','6','7','8','9'] : [...new Set(digitsStr.split(''))];
+    return {digits, amount, type:'apue'};
+  }
+  function processTeit(line){
+    let match = line.match(/^([0-9]+)ထိပ်(\d+)$/);
+    if(!match) return null;
+    let digits = [...new Set(match[1].split(''))];
+    let amount = parseInt(match[2]);
+    if(digits.length===0) return null;
+    return {digits, amount, type:'teit'};
+  }
+  function processLel(line){
+    let match = line.match(/^([0-9]+)လယ်(\d+)$/);
+    if(!match) return null;
+    let digits = [...new Set(match[1].split(''))];
+    let amount = parseInt(match[2]);
+    return {digits, amount, type:'lel'};
+  }
+  function processPeit(line){
+    let match = line.match(/^([0-9]+)ပိတ်(\d+)$/);
+    if(!match) return null;
+    let digits = [...new Set(match[1].split(''))];
+    let amount = parseInt(match[2]);
+    return {digits, amount, type:'peit'};
+  }
+  function processDirectAndR(line){
+    line = line.trim();
+    let eqMatch = line.match(/^([\d\s\/\*\.,-]+)=(\d+)$/);
+    if(eqMatch){
+      let numbers = splitNumbers(eqMatch[1]);
+      let amount = parseInt(eqMatch[2]);
+      if(numbers.length) return {type:'eqMethod', numbers, amount};
+    }
+    let rMatch = line.match(/^([\d\s\/\*\.,-]+)r(\d+)$/i);
+    if(rMatch){
+      let baseNumbers = splitNumbers(rMatch[1]);
+      let amount = parseInt(rMatch[2]);
+      if(baseNumbers.length){
+        let allNumbers=[];
+        baseNumbers.forEach(num=>{ let perms=permute3(pad3(num)); allNumbers.push(...perms); });
+        return {type:'rMethod', numbers:allNumbers, amount};
+      }
+    }
+    return null;
+  }
+  
+  // ---------- GLOBAL STATE ----------
+  let persons = new Map();
+  let currentPerson = "Default";
+  let globalHistory = [];
+  let maxBetLimit = 50000;
+  let remainingShown = false;
+  let blockedNumbers = new Set();
+  
+  function saveBlockNumbers() { localStorage.setItem('blockedNumbers', JSON.stringify(Array.from(blockedNumbers))); }
+  function loadBlockNumbers(){
+    let raw = localStorage.getItem('blockedNumbers');
+    if(raw) { try{ let arr=JSON.parse(raw); blockedNumbers=new Set(arr); }catch(e){} }
+    updateBlockUI();
+  }
+  function isNumberBlocked(num){ return blockedNumbers.has(num); }
+  function addBlockNumber(num){
+    if(num<0||num>999) return false;
+    if(blockedNumbers.has(num)) return false;
+    blockedNumbers.add(num); saveBlockNumbers(); updateBlockUI(); return true;
+  }
+  function removeBlockNumber(num){ if(blockedNumbers.delete(num)){ saveBlockNumbers(); updateBlockUI(); return true; } return false; }
+  function updateBlockUI(){
+    let container = document.getElementById('block-list-container');
+    let countSpan = document.getElementById('block-count-badge');
+    let sorted = Array.from(blockedNumbers).sort((a,b)=>a-b);
+    if(countSpan) countSpan.textContent = sorted.length;
+    if(!container) return;
+    if(sorted.length===0) container.innerHTML = '<div style="padding:8px;text-align:center;">No blocked numbers</div>';
+    else {
+      container.innerHTML = sorted.map(num=>`<div class="block-item"><span class="block-number">🚫 ${pad3(num)}</span><button class="small ghost unblock-btn" data-num="${num}">Unblock</button></div>`).join('');
+      document.querySelectorAll('.unblock-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ removeBlockNumber(parseInt(btn.dataset.num)); notify(`Unblocked ${pad3(parseInt(btn.dataset.num))}`,'warning'); updateAll(); }); });
+    }
+    let infoSpan = document.getElementById('quick-block-info');
+    if(infoSpan){
+      let preview = Array.from(blockedNumbers).slice(0,8).map(n=>pad3(n)).join(', ');
+      if(blockedNumbers.size===0) infoSpan.innerHTML = '<i class="fas fa-check-circle"></i> No active blocked numbers.';
+      else infoSpan.innerHTML = `<i class="fas fa-ban"></i> Blocked (${blockedNumbers.size}): ${preview}${blockedNumbers.size>8?'...':''}`;
+    }
+  }
+  
+  function ensurePerson(name){ if(!persons.has(name)) persons.set(name, {capped:new Map(), excess:new Map()}); }
+  function getCurrentData(){ ensurePerson(currentPerson); return persons.get(currentPerson); }
+  
+  function addBetToPerson(personName, num, addAmount){
+    if(addAmount<=0) return false;
+    if(isNumberBlocked(num)) { return false; }
+    ensurePerson(personName);
+    let data = persons.get(personName);
+    let currentCapped = data.capped.get(num)||0;
+    let currentExcess = data.excess.get(num)||0;
+    let totalAfter = currentCapped + currentExcess + addAmount;
+    if(maxBetLimit>0 && totalAfter>maxBetLimit){
+      let newCapped = maxBetLimit;
+      let newExcess = totalAfter - maxBetLimit;
+      if(newCapped>0) data.capped.set(num, newCapped); else data.capped.delete(num);
+      if(newExcess>0) data.excess.set(num, newExcess); else data.excess.delete(num);
+    } else {
+      let newCapped = currentCapped + addAmount;
+      if(newCapped>0) data.capped.set(num, newCapped); else data.capped.delete(num);
+      if(data.excess.has(num)) data.excess.delete(num);
+    }
+    return true;
+  }
+  
+  function getTotalCappedSum(personName){
+    let data = persons.get(personName);
+    if(!data) return 0;
+    let sum=0; for(let v of data.capped.values()) sum+=v; return sum;
+  }
+  
+  function updateLedgerDisplay(){
+    let data = getCurrentData();
+    let grid = document.getElementById('ledger-grid');
+    grid.innerHTML = '';
+    let maxVal=0;
+    let entries = Array.from(data.capped.entries()).map(([num,amt])=>({num,amt})).sort((a,b)=>b.amt-a.amt);
+    for(let {num,amt} of entries){
+      let div = document.createElement('div'); div.className='grid-item';
+      let blockedBadge = isNumberBlocked(num) ? '<span class="block-tag">🚫 Blocked</span>' : '';
+      div.innerHTML = `<div class="grid-number">${pad3(num)}${blockedBadge}</div><div class="grid-amount">${amt.toLocaleString()}</div><div class="subtract-btn">-</div>`;
+      div.querySelector('.grid-number').addEventListener('click',()=>{ if(confirm(`Remove ${pad3(num)} from ${currentPerson}?`)){ data.capped.delete(num); data.excess.delete(num); updateAll(); notify(`Removed ${pad3(num)}`,'warning'); } });
+      div.querySelector('.subtract-btn').addEventListener('click',(e)=>{ e.stopPropagation(); handleSubtract(num, amt, data); });
+      grid.appendChild(div);
+      maxVal = Math.max(maxVal, amt);
+    }
+    let totalCap = getTotalCappedSum(currentPerson);
+    document.getElementById('stat-count').textContent = data.capped.size;
+    document.getElementById('stat-sum').textContent = totalCap.toLocaleString();
+    document.getElementById('total-amount').textContent = totalCap.toLocaleString();
+    document.getElementById('stat-coverage').textContent = `${(data.capped.size/10).toFixed(1)}%`;
+    document.getElementById('stat-max').textContent = maxVal.toLocaleString();
+    document.getElementById('current-person-name').textContent = currentPerson;
+    updateExcessPanel(data);
+    if(remainingShown) showRemainingNumbers();
+    saveData();
+  }
+  
+  function updateExcessPanel(data){
+    let area = document.getElementById('excess-separate-area');
+    if(data.excess.size===0){ area.innerHTML=''; return; }
+    let items=[];
+    for(let [num,amt] of data.excess.entries()) if(amt>0) items.push({num,amt});
+    if(items.length===0){ area.innerHTML=''; return; }
+    let copyText = items.map(i=>`${pad3(i.num)} ${i.amt}`).join('\n');
+    area.innerHTML = `<div class="excess-panel"><div class="excess-title"><span><i class="fas fa-exclamation-triangle"></i> 🔴 OVER-LIMIT EXCESS</span><button id="copyExcessOnlyBtn" class="copy-excess-btn">Copy Excess</button></div><div class="excess-list">${items.map(i=>`<div class="excess-row"><span>${pad3(i.num)}</span><span>+ ${i.amt.toLocaleString()} (excess)</span></div>`).join('')}</div></div>`;
+    document.getElementById('copyExcessOnlyBtn')?.addEventListener('click',async()=>{ await navigator.clipboard.writeText(copyText); notify('Excess copied'); });
+  }
+  
+  async function handleSubtract(num, currentCapped, data){
+    let excessAmt = data.excess.get(num)||0;
+    let total = currentCapped+excessAmt;
+    let deduct = parseInt(prompt(`Deduct from ${pad3(num)} (Capped:${currentCapped}, Excess:${excessAmt}, Total:${total}):`,'0'));
+    if(isNaN(deduct)||deduct<=0) return;
+    if(deduct>=total){ if(confirm(`Remove ${pad3(num)} completely?`)){ data.capped.delete(num); data.excess.delete(num); updateAll(); notify(`Removed ${pad3(num)}`,'warning'); } return; }
+    let remExcess = excessAmt, remCapped = currentCapped, left=deduct;
+    if(remExcess>=left){ remExcess-=left; left=0; } else { left-=remExcess; remExcess=0; remCapped-=left; }
+    if(remCapped<=0) data.capped.delete(num); else data.capped.set(num,remCapped);
+    if(remExcess>0) data.excess.set(num,remExcess); else data.excess.delete(num);
+    updateAll();
+    await navigator.clipboard.writeText(`${pad3(num)} ${remCapped+remExcess}`);
+    notify(`Deducted ${deduct.toLocaleString()}, remaining ${(remCapped+remExcess).toLocaleString()} copied`);
+  }
+  
+  function updateAll(){ updateLedgerDisplay(); saveData(); updateBlockUI(); }
+  
+  function addHistoryEntry(details){
+    globalHistory.unshift({ time: new Date().toISOString(), details });
+    if(globalHistory.length>200) globalHistory.pop();
+    localStorage.setItem('globalHistory', JSON.stringify(globalHistory));
+    updateHistoryDisplay();
+  }
+  
+  function updateHistoryDisplay(){
+    let histDiv=document.getElementById('history-list');
+    if(!histDiv) return;
+    if(globalHistory.length===0){ histDiv.innerHTML='<div style="padding:20px;text-align:center;">No history</div>'; return; }
+    histDiv.innerHTML = globalHistory.map(h=>`<div style="padding:5px; border-bottom:1px solid rgba(255,255,255,0.1);">${new Date(h.time).toLocaleString()} - ${h.details}</div>`).join('');
+  }
+  
+  function renderPersonSelectors(){
+    let personNames = Array.from(persons.keys());
+    if(personNames.length===0){ persons.set("Default",{capped:new Map(), excess:new Map()}); personNames=["Default"]; }
+    let container = document.getElementById('ledger-person-buttons');
+    if(container){
+      container.innerHTML = personNames.map(p=>`<div class="person-badge ${currentPerson===p?'active':''}" data-person="${p}">${p}</div>`).join('');
+      document.querySelectorAll('#ledger-person-buttons .person-badge').forEach(el=>{ el.addEventListener('click',()=>{ currentPerson=el.dataset.person; renderPersonSelectors(); updateLedgerDisplay(); if(remainingShown) showRemainingNumbers(); }); });
+    }
+  }
+  
+  function managePersonsUI(){
+    let container = document.getElementById('persons-list-container');
+    if(!container) return;
+    let personList = Array.from(persons.keys());
+    container.innerHTML = personList.map(p=>`<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:6px; border-radius:6px;"><span><i class="fas fa-user"></i> ${p}</span><div><button class="small edit-person-btn" data-name="${p}">Edit</button><button class="small danger delete-person-btn" data-name="${p}">Delete</button></div></div>`).join('');
+    document.querySelectorAll('.edit-person-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ let old=btn.dataset.name; let newName=prompt('New name:',old); if(newName && newName!==old && !persons.has(newName)){ let data=persons.get(old); persons.set(newName,data); persons.delete(old); if(currentPerson===old) currentPerson=newName; renderPersonSelectors(); updateLedgerDisplay(); managePersonsUI(); saveData(); } else if(newName===old) notify('Same name'); else if(persons.has(newName)) notify('Person exists'); }); });
+    document.querySelectorAll('.delete-person-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ let name=btn.dataset.name; if(name==='Default'){ notify('Cannot delete Default','warning'); return; } if(confirm(`Delete ${name}?`)){ persons.delete(name); if(currentPerson===name) currentPerson='Default'; renderPersonSelectors(); updateLedgerDisplay(); managePersonsUI(); saveData(); } }); });
+  }
+  
+  function showRemainingNumbers(){
+    let data = getCurrentData();
+    let rem=[];
+    for(let i=0;i<1000;i++) if(!data.capped.has(i) && !data.excess.has(i) && !isNumberBlocked(i)) rem.push(pad3(i));
+    let out=[]; for(let i=0;i<rem.length;i+=6) out.push(rem.slice(i,i+6).join('  '));
+    document.getElementById('remaining-box').textContent=out.join('\n')||'(None)';
+    remainingShown=true;
+    document.getElementById('btn-show-remaining').innerHTML='<i class="fas fa-eye-slash"></i> Hide';
+  }
+  
+  function computeRemainingCurrent(){ let data=getCurrentData(); let rem=[]; for(let i=0;i<1000;i++) if(!data.capped.has(i) && !data.excess.has(i) && !isNumberBlocked(i)) rem.push(i); return rem; }
+  
+  function saveData(){
+    let serialized={};
+    for(let [name,{capped,excess}] of persons.entries()) serialized[name]={capped:Object.fromEntries(capped), excess:Object.fromEntries(excess)};
+    localStorage.setItem('personsData', JSON.stringify(serialized));
+    localStorage.setItem('currentPerson', currentPerson);
+    localStorage.setItem('maxBetLimit', maxBetLimit);
+    localStorage.setItem('globalHistory', JSON.stringify(globalHistory));
+  }
+  
+  function loadData(){
+    let saved = localStorage.getItem('personsData');
+    if(saved){ try{ let obj=JSON.parse(saved); for(let [name,data] of Object.entries(obj)) persons.set(name,{capped:new Map(Object.entries(data.capped).map(([k,v])=>[parseInt(k),v])), excess:new Map(Object.entries(data.excess).map(([k,v])=>[parseInt(k),v]))}); }catch(e){} }
+    if(persons.size===0) persons.set('Default',{capped:new Map(), excess:new Map()});
+    let savedCurr=localStorage.getItem('currentPerson'); if(savedCurr && persons.has(savedCurr)) currentPerson=savedCurr;
+    let limit=localStorage.getItem('maxBetLimit'); if(limit) maxBetLimit=parseInt(limit);
+    let hist=localStorage.getItem('globalHistory'); if(hist) globalHistory=JSON.parse(hist);
+    document.getElementById('max-bet-limit').value = maxBetLimit;
+  }
+  
+  // ---------- BULK SUBMIT LOGIC (with new PAT type) ----------
+  function processBulkLine(line, personName){
+    let addedNumbers=0;
+    let totalAmountAdded=0;
+    
+    // 1. Direct+Perm Group
+    let dpg = processDirectPermGroup(line);
+    if(dpg){
+      for(let baseNum of dpg.numbers){
+        if(addBetToPerson(personName, baseNum, dpg.directAmount)){
+          addedNumbers++;
+          totalAmountAdded += dpg.directAmount;
+        }
+        let perms = permute3(pad3(baseNum));
+        for(let p of perms){
+          if(p !== baseNum && addBetToPerson(personName, p, dpg.permAmount)){
+            addedNumbers++;
+            totalAmountAdded += dpg.permAmount;
+          }
+        }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    
+    // 2. Range
+    let range = processRange(line);
+    if(range){
+      for(let n=range.start; n<=range.end; n++){
+        if(range.method==='r'){
+          let perms = permute3(pad3(n));
+          perms.forEach(p=>{ if(addBetToPerson(personName, p, range.amount)){ addedNumbers++; totalAmountAdded+=range.amount; } });
+        } else {
+          if(addBetToPerson(personName, n, range.amount)){ addedNumbers++; totalAmountAdded+=range.amount; }
+        }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    // Khwe
+    let khwe = processKhwe(line);
+    if(khwe){
+      let digits = [...new Set(khwe.digits)];
+      let n=digits.length;
+      if(n<3) return {ok:false, error:'Need at least 3 different digits'};
+      for(let i=0;i<n;i++) for(let j=0;j<n;j++) if(j!==i) for(let k=0;k<n;k++) if(k!==i && k!==j){
+        let num = parseInt(digits[i]+digits[j]+digits[k]);
+        if(addBetToPerson(personName, num, khwe.amount)){ addedNumbers++; totalAmountAdded+=khwe.amount; }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let khwePat = processKhwePattern(line);
+    if(khwePat){
+      khwePat.numbers.forEach(num=>{ if(addBetToPerson(personName, num, khwePat.amount)){ addedNumbers++; totalAmountAdded+=khwePat.amount; } });
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let kpt = processKhwePuKhweTri(line);
+    if(kpt){
+      for(let d1 of kpt.digits) for(let d2 of kpt.digits) for(let d3 of kpt.digits){
+        let num = parseInt(`${d1}${d2}${d3}`);
+        if(addBetToPerson(personName, num, kpt.amount)){ addedNumbers++; totalAmountAdded+=kpt.amount; }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let apue = processApue(line);
+    if(apue){
+      for(let x=0;x<=9;x++) for(let y=0;y<=9;y++) if(x!==y){
+        if(apue.digits.includes(x.toString()) || apue.digits.includes(y.toString())){
+          let num1 = parseInt(`${x}${x}${y}`), num2 = parseInt(`${x}${y}${y}`);
+          if(addBetToPerson(personName, num1, apue.amount)){ addedNumbers++; totalAmountAdded+=apue.amount; }
+          if(addBetToPerson(personName, num2, apue.amount)){ addedNumbers++; totalAmountAdded+=apue.amount; }
+        }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let teit = processTeit(line);
+    if(teit){
+      for(let d of teit.digits) for(let j=0;j<=9;j++) for(let k=0;k<=9;k++){
+        let num = parseInt(`${d}${j}${k}`);
+        if(addBetToPerson(personName, num, teit.amount)){ addedNumbers++; totalAmountAdded+=teit.amount; }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let lel = processLel(line);
+    if(lel){
+      for(let d of lel.digits) for(let i=0;i<=9;i++) for(let k=0;k<=9;k++){
+        let num = parseInt(`${i}${d}${k}`);
+        if(addBetToPerson(personName, num, lel.amount)){ addedNumbers++; totalAmountAdded+=lel.amount; }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let peit = processPeit(line);
+    if(peit){
+      for(let d of peit.digits) for(let i=0;i<=9;i++) for(let j=0;j<=9;j++){
+        let num = parseInt(`${i}${j}${d}`);
+        if(addBetToPerson(personName, num, peit.amount)){ addedNumbers++; totalAmountAdded+=peit.amount; }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    
+    // 🆕 PAT (ပတ်) - any number containing at least one given digit
+    let pat = processPat(line);
+    if(pat){
+      for(let num of pat.numbers){
+        if(addBetToPerson(personName, num, pat.amount)){
+          addedNumbers++;
+          totalAmountAdded += pat.amount;
+        }
+      }
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    
+    let dr = processDirectAndR(line);
+    if(dr){
+      dr.numbers.forEach(num=>{ if(addBetToPerson(personName, num, dr.amount)){ addedNumbers++; totalAmountAdded+=dr.amount; } });
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    let parts = line.split(/\s+/);
+    if(parts.length>=2 && !isNaN(parseInt(parts[parts.length-1]))){
+      let amount = parseInt(parts.pop());
+      let nums = splitNumbers(parts.join(' '));
+      if(nums.length){
+        nums.forEach(n=>{ if(addBetToPerson(personName, n, amount)){ addedNumbers++; totalAmountAdded+=amount; } });
+        return {ok:true, count:addedNumbers, total:totalAmountAdded};
+      }
+    }
+    let singleNum = splitNumbers(line);
+    if(singleNum.length){
+      let defaultAmt = 500;
+      singleNum.forEach(n=>{ if(addBetToPerson(personName, n, defaultAmt)){ addedNumbers++; totalAmountAdded+=defaultAmt; } });
+      return {ok:true, count:addedNumbers, total:totalAmountAdded};
+    }
+    return {ok:false, error:'Unknown format'};
+  }
+  
+  document.getElementById('btn-submit-bulk')?.addEventListener('click',()=>{
+    let text = document.getElementById('bulk-input').value.trim();
+    if(!text){ notify('Please enter bets','warning'); return; }
+    let lines = text.split('\n').map(l=>l.trim()).filter(l=>l);
+    let totalAddedNumbers=0, totalAddedAmount=0, lineSuccess=0;
+    for(let line of lines){
+      let res = processBulkLine(line, currentPerson);
+      if(res.ok){
+        lineSuccess++;
+        totalAddedNumbers += res.count;
+        totalAddedAmount += res.total;
+      } else {
+        notify(`Line failed: ${line.substring(0,40)}... (${res.error})`,'warning');
+        addHistoryEntry(`❌ Bulk line error: ${line}`);
+      }
+    }
+    updateAll();
+    if(totalAddedNumbers>0){
+      addHistoryEntry(`📦 Bulk added ${totalAddedNumbers} numbers, total amount ${totalAddedAmount.toLocaleString()} for ${currentPerson}`);
+      notify(`✅ Added ${totalAddedNumbers} bets | total ${totalAddedAmount.toLocaleString()}`);
+    } else {
+      notify('No valid bets added (maybe all blocked or invalid)','warning');
+    }
+    document.getElementById('bulk-input').value = '';
+  });
+  
+  document.getElementById('btn-preview-bulk')?.addEventListener('click',()=>{
+    let text = document.getElementById('bulk-input').value.trim();
+    if(!text){ notify('Nothing to preview','warning'); return; }
+    let lines = text.split('\n').filter(l=>l.trim());
+    alert(`Total lines: ${lines.length}\n\nFirst 10 lines:\n${lines.slice(0,10).join('\n')}`);
+  });
+  document.getElementById('btn-clear-bulk')?.addEventListener('click',()=>{ document.getElementById('bulk-input').value=''; });
+  
+  document.getElementById('btn-add-bet')?.addEventListener('click',()=>{
+    let rawNum = document.getElementById('manual-number').value;
+    let rawAmount = document.getElementById('manual-amount').value;
+    let num = parseInt(rawNum), amount = parseInt(rawAmount);
+    if(isNaN(num)||num<0||num>999){ notify('Invalid number 0-999','warning'); return; }
+    if(isNaN(amount)||amount<=0){ notify('Amount must be positive','warning'); return; }
+    if(addBetToPerson(currentPerson, num, amount)){
+      updateAll();
+      addHistoryEntry(`➕ Added ${pad3(num)} ${amount.toLocaleString()} → ${currentPerson}`);
+      notify(`Added ${pad3(num)}: ${amount.toLocaleString()}`);
+      document.getElementById('manual-number').value='';
+      document.getElementById('manual-amount').value='';
+    } else {
+      if(isNumberBlocked(num)) notify(`❌ ${pad3(num)} is blocked!`,'danger');
+      else notify('Add failed (limit?)','warning');
+    }
+  });
+  
+  document.getElementById('btn-show-remaining')?.addEventListener('click',()=>{ if(!remainingShown) showRemainingNumbers(); else { document.getElementById('remaining-box').textContent='(Click "Show")'; remainingShown=false; document.getElementById('btn-show-remaining').innerHTML='<i class="fas fa-eye"></i> Show'; } });
+  document.getElementById('btn-copy-remaining')?.addEventListener('click',async()=>{ if(!remainingShown) notify('Show remaining first'); else await navigator.clipboard.writeText(document.getElementById('remaining-box').textContent); notify('Copied'); });
+  document.getElementById('btn-add-remaining')?.addEventListener('click',()=>{ let rem=computeRemainingCurrent(); if(!rem.length){ notify('No remaining (unblocked)','warning'); return; } let amt=500; if(confirm(`Add all ${rem.length} unblocked numbers with ${amt} each to ${currentPerson}?`)){ rem.forEach(n=>addBetToPerson(currentPerson,n,amt)); updateAll(); notify(`Added ${rem.length} numbers`); addHistoryEntry(`📦 Bulk add remaining (${rem.length} numbers)`); } });
+  document.getElementById('btn-copy')?.addEventListener('click',async()=>{ let data=getCurrentData(); let lines=[]; for(let [num,amt] of data.capped.entries()) lines.push(`${pad3(num)} ${amt}`); if(lines.length) await navigator.clipboard.writeText(lines.join('\n')); notify('Ledger copied'); });
+  document.getElementById('btn-copy-deducted')?.addEventListener('click',async()=>{ let deduct=parseInt(prompt('Deduct amount from ALL for current person:','0')); if(isNaN(deduct)||deduct<=0) return; let data=getCurrentData(); let newCapped=new Map(), newExcess=new Map(); for(let [num,cap] of data.capped.entries()){ let excess=data.excess.get(num)||0; let total=cap+excess; let newTotal=total-deduct; if(newTotal>0){ let newCap=Math.min(newTotal,maxBetLimit); let newEx=newTotal>maxBetLimit?newTotal-maxBetLimit:0; if(newCap>0) newCapped.set(num,newCap); if(newEx>0) newExcess.set(num,newEx); } } data.capped=newCapped; data.excess=newExcess; updateAll(); let lines=[]; for(let [num,amt] of data.capped.entries()) lines.push(`${pad3(num)} ${amt}`); await navigator.clipboard.writeText(lines.join('\n')); notify(`Deducted ${deduct.toLocaleString()}`); });
+  document.getElementById('btn-clear')?.addEventListener('click',()=>{ if(confirm(`Clear ALL ledger & excess for ${currentPerson}?`)){ let data=getCurrentData(); data.capped.clear(); data.excess.clear(); updateAll(); notify('Cleared','warning'); } });
+  document.getElementById('btn-check-winning')?.addEventListener('click',()=>{ let txt=document.getElementById('winning-input').value.trim(); if(!txt) return; let nums=txt.split(/[,\s]+/).map(n=>parseInt(n.trim())).filter(n=>!isNaN(n)&&n>=0&&n<=999).map(n=>n<10?n*100:(n<100?n*10:n)); if(!nums.length) return; let mult=parseInt(document.getElementById('winning-multiplier-select').value); let data=getCurrentData(); let total=0, breakdown=[], winners=0; nums.forEach(num=>{ let cap=data.capped.get(num)||0; let excess=data.excess.get(num)||0; let totalBet=cap+excess; if(totalBet){ let win=totalBet*mult; total+=win; winners++; breakdown.push(`<div>${pad3(num)}: ${totalBet}×${mult}=<b style="color:gold;">${win.toLocaleString()}</b></div>`); } else breakdown.push(`<div>${pad3(num)}: No bet</div>`); }); let resultDiv=document.getElementById('winning-result'); resultDiv.innerHTML=`<div>🎉 ${winners} winner(s)! Total Win: <b style="color:gold;">${total.toLocaleString()}</b></div>${breakdown.join('')}`; resultDiv.style.display='block'; });
+  document.getElementById('btn-clear-winning')?.addEventListener('click',()=>{ document.getElementById('winning-input').value=''; document.getElementById('winning-result').style.display='none'; });
+  document.getElementById('btn-clear-history')?.addEventListener('click',()=>{ globalHistory=[]; localStorage.removeItem('globalHistory'); updateHistoryDisplay(); notify('History cleared'); });
+  document.getElementById('btn-save-maxbet')?.addEventListener('click',()=>{ let newL=parseInt(document.getElementById('max-bet-limit').value); maxBetLimit=Math.max(0,newL); localStorage.setItem('maxBetLimit',maxBetLimit); for(let [pname,data] of persons.entries()){ let newCapped=new Map(), newExcess=new Map(); let allNums=new Set([...data.capped.keys(),...data.excess.keys()]); for(let num of allNums){ let total=(data.capped.get(num)||0)+(data.excess.get(num)||0); if(maxBetLimit>0 && total>maxBetLimit){ newCapped.set(num, maxBetLimit); newExcess.set(num, total-maxBetLimit); } else if(total>0) newCapped.set(num,total); } data.capped=newCapped; data.excess=newExcess; } updateAll(); notify(`Limit set to ${maxBetLimit===0?'unlimited':maxBetLimit.toLocaleString()}`); });
+  document.getElementById('open-person-mgt')?.addEventListener('click',()=>{ managePersonsUI(); document.querySelector('.tab[data-tab="person"]').click(); });
+  document.getElementById('btn-add-person')?.addEventListener('click',()=>{ let name=document.getElementById('new-person-name').value.trim(); if(name && !persons.has(name)){ persons.set(name,{capped:new Map(), excess:new Map()}); renderPersonSelectors(); managePersonsUI(); saveData(); notify(`Person ${name} added`); document.getElementById('new-person-name').value=''; } else notify('Invalid or duplicate','warning'); });
+  document.getElementById('btn-add-block')?.addEventListener('click',()=>{ let num=parseInt(document.getElementById('block-number-input').value); if(isNaN(num)||num<0||num>999){ notify('Enter 0-999','warning'); return; } if(addBlockNumber(num)){ notify(`Blocked ${pad3(num)}`); updateAll(); } else notify(`Already blocked`,'warning'); document.getElementById('block-number-input').value=''; });
+  document.getElementById('btn-copy-blocks')?.addEventListener('click',async()=>{ let blocks=Array.from(blockedNumbers).sort((a,b)=>a-b).map(n=>pad3(n)).join('\n'); await navigator.clipboard.writeText(blocks||'(none)'); notify('Block list copied'); });
+  
+  let tabs=document.querySelectorAll('.tab');
+  let ledgerCard=document.getElementById('ledger-card'), bulkCard=document.getElementById('bulk-card'), winningCard=document.getElementById('winning-card'), historyCard=document.getElementById('history-card'), settingsCard=document.getElementById('settings-card'), twodCard=document.getElementById('twod-card'), personCard=document.getElementById('person-card'), blockCard=document.getElementById('block-card');
+  tabs.forEach(tab=>{ tab.addEventListener('click',()=>{ if(tab.dataset.tab==='twod'){ window.location.href='history.html';return; } tabs.forEach(t=>t.classList.remove('active')); tab.classList.add('active'); [ledgerCard,bulkCard,winningCard,historyCard,settingsCard,twodCard,personCard,blockCard].forEach(c=>{ if(c) c.style.display='none'; }); if(tab.dataset.tab==='ledger' && ledgerCard) ledgerCard.style.display='block'; else if(tab.dataset.tab==='add-bets' && bulkCard) bulkCard.style.display='block'; else if(tab.dataset.tab==='winning' && winningCard) winningCard.style.display='block'; else if(tab.dataset.tab==='history' && historyCard) { historyCard.style.display='block'; updateHistoryDisplay(); } else if(tab.dataset.tab==='settings' && settingsCard) settingsCard.style.display='block'; else if(tab.dataset.tab==='person' && personCard) { personCard.style.display='block'; managePersonsUI(); } else if(tab.dataset.tab==='block' && blockCard) { blockCard.style.display='block'; updateBlockUI(); } }); });
+  
+  function notify(msg,type='success'){ let c=document.getElementById('notification-container'); let n=document.createElement('div'); n.className=`notification ${type}`; n.textContent=msg; c.appendChild(n); setTimeout(()=>n.remove(),2500); }
+  
+  loadData();
+  loadBlockNumbers();
+  renderPersonSelectors();
+  updateLedgerDisplay();
+  updateHistoryDisplay();
+  updateBlockUI();
+})();
+</script>
+</body>
+</html>
